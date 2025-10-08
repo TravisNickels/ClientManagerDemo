@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "docker:start": "docker compose -f docker-compose.yml up",
+    "docker:stop": "docker compose down --volumes --rmi all"
+  }
+}
