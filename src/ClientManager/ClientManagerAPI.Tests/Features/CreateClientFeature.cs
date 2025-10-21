@@ -3,6 +3,8 @@ using ClientManagerAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using FluentAssertions;
+using ClientManagerAPI.Repositories;
+using Moq;
 
 namespace ClientManagerAPI.Tests.Features;
 
@@ -14,7 +16,7 @@ internal class CreateClientFeature
     ClientRepository _clientRepository = null!;
 
     [OneTimeSetUp]
-    public async Task Setup()
+    public async Task CreatePostgresContainer()
     {
         _container = new PostgreSqlBuilder()
             .WithDatabase("clientManagerTestDb")
@@ -23,15 +25,6 @@ internal class CreateClientFeature
             .Build();
 
         await _container.StartAsync();
-
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
-            .Options;
-
-        _dbContext = new AppDbContext(options);
-
-        _dbContext.Database.EnsureCreated();
-
     }
 
     [OneTimeTearDown]
@@ -43,8 +36,29 @@ internal class CreateClientFeature
             await _dbContext.DisposeAsync();
     }
 
+    [SetUp]
+    public void CreateDbContext()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+           .UseNpgsql(_container.GetConnectionString())
+           .Options;
+
+        _dbContext = new AppDbContext(options);
+
+        _dbContext.Database.EnsureCreated();
+
+        _clientRepository = new ClientRepository(_dbContext);
+    }
+
+    [TearDown]
+    public async Task ClearDatabase()
+    {
+        if (_dbContext is not null)
+            await _dbContext.DisposeAsync();
+    }
+
     [Test]
-    public async Task When_Creating_A_Valid_Client_It_Should_Be_Saved_And_Retrievable()
+    public async Task When_Creating_A_Valid_Client_Then_It_Should_Be_Saved_And_Returned()
     {
         // Given a new valid client
         var newClient = new Client
@@ -61,6 +75,57 @@ internal class CreateClientFeature
         // Then the client should be retrievable
         savedClient.Should().NotBeNull();
         savedClient.Should().BeEquivalentTo(newClient);
+    }
+
+    [Test]
+    public async Task When_Creating_A_Client_Without_A_FirstName_It_Should_Throw_DbUpdateException()
+    {
+        // Given a new client without an email
+        var newClient = new Client
+        {
+            Id = 2,
+            FirstName = null,
+            LastName = "Solo",
+            Email = "han.solo@gmail.com"
+        };
+        // When saving the client to the database
+        Func<Task> act = async () => { await _clientRepository.AddAsync(newClient); };
+        // Then a DbUpdateException should be thrown
+        await act.Should().ThrowAsync<DbUpdateException>();
+    }
+
+    [Test]
+    public async Task When_Creating_A_Valid_Client_Then_The_Service_Should_Assign_A_Unique_Id_Before_Saving()
+    {
+        // Given a new valid client without an Id
+        var newClient = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "Leia",
+            LastName = "Organa",
+            Email = "leia.organa@gmail.com"
+        };
+
+        var repoMock = new Mock<IClientRepository>();
+        Client? savedClient = null;
+
+        repoMock
+            .Setup(r => r.AddAsync(It.IsAny<Client>()))
+            .Callback<Client>(c => savedClient = c)
+            .ReturnsAsync((Client client) => client);
+
+        var service = new ClientService(repoMock.Object);
+
+        var result = await service.CreateClientAsync(newClient);
+
+        // When saving the client to the database
+        //var savedClient = await _clientRepository.AddAsync(newClient);
+        // Then the client should have a unique Id assigned
+        savedClient.Should().NotBeNull();
+        savedClient.Id.Should().NotBe(Guid.Empty, "the service should assign a GUID before saving");
+
+        result.Id.Should().be(savedClient.Id);
+        //savedClient.Id.Should().BeGreaterThan(0);
     }
 }
 
