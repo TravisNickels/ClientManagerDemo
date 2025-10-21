@@ -5,7 +5,7 @@ namespace ClientManagerAPI.Models;
 public class Client
 {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     [Required]
     [StringLength(100)]
     public string? FirstName { get; set; }

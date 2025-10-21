@@ -6,7 +6,7 @@ namespace ClientManagerAPI.Models;
 public class Phone
 {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     [Required]
     [ForeignKey("Client")]
     public int ClientId { get; set; }
