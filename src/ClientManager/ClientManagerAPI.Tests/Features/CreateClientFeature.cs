@@ -89,8 +89,10 @@ internal class CreateClientFeature
             LastName = "Solo",
             Email = "han.solo@gmail.com"
         };
+
         // When saving the client to the database
         Func<Task> act = async () => { await _clientRepository.AddAsync(newClient); };
+
         // Then a DbUpdateException should be thrown
         await act.Should().ThrowAsync<DbUpdateException>();
     }
@@ -112,21 +114,19 @@ internal class CreateClientFeature
 
         repoMock
             .Setup(r => r.AddAsync(It.IsAny<Client>()))
-            .Callback<Client>(c => savedClient = c)
+            .Callback<Client>(client => savedClient = client)
             .ReturnsAsync((Client client) => client);
 
         var service = new ClientService(repoMock.Object);
 
+        // When saving the client to the database
         var result = await service.CreateClientAsync(newClient);
 
-        // When saving the client to the database
-        //var savedClient = await _clientRepository.AddAsync(newClient);
         // Then the client should have a unique Id assigned
         savedClient.Should().NotBeNull();
         savedClient.Id.Should().NotBe(Guid.Empty, "the service should assign a GUID before saving");
 
         result.Id.Should().Be(savedClient.Id);
-        //savedClient.Id.Should().BeGreaterThan(0);
     }
 }
 
