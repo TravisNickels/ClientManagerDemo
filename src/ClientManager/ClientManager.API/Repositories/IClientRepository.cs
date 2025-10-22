@@ -1,6 +1,6 @@
-﻿using ClientManagerAPI.Models;
+﻿using ClientManager.API.Models;
 
-namespace ClientManagerAPI.Repositories;
+namespace ClientManager.API.Repositories;
 
 public interface IClientRepository
 {

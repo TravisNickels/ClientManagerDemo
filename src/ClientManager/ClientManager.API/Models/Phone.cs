@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ClientManagerAPI.Models;
+namespace ClientManager.API.Models;
 
 public class Phone
 {

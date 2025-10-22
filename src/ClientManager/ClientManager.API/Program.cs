@@ -1,5 +1,5 @@
-using ClientManagerAPI.Config;
-using ClientManagerAPI.Data;
+using ClientManager.API.Config;
+using ClientManager.API.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClientManagerAPI\ClientManager.API.csproj" />
+    <ProjectReference Include="..\ClientManager.API\ClientManager.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
-﻿using ClientManagerAPI.Models;
-using ClientManagerAPI.Repositories;
+﻿using ClientManager.API.Models;
+using ClientManager.API.Repositories;
 
-namespace ClientManagerAPI.Services;
+namespace ClientManager.API.Services;
 
 public class ClientService(IClientRepository clientRepository)
 {

@@ -1,11 +1,11 @@
-﻿using ClientManagerAPI.Data;
-using ClientManagerAPI.Models;
+﻿using ClientManager.API.Data;
+using ClientManager.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using FluentAssertions;
-using ClientManagerAPI.Repositories;
+using ClientManager.API.Repositories;
 using Moq;
-using ClientManagerAPI.Services;
+using ClientManager.API.Services;
 
 namespace ClientManagerAPI.Tests.Features;
 

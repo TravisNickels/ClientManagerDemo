@@ -1,4 +1,4 @@
-﻿namespace ClientManagerAPI.Config;
+﻿namespace ClientManager.API.Config;
 
 public class ConfigHelper
 {

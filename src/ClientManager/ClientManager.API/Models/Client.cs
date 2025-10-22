@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ClientManagerAPI.Models;
+namespace ClientManager.API.Models;
 
 public class Client
 {
