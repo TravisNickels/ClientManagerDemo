@@ -9,7 +9,7 @@ public class Phone
     public Guid Id { get; set; }
     [Required]
     [ForeignKey("Client")]
-    public int ClientId { get; set; }
+    public Guid ClientId { get; set; }
     [Required]
     public string Number { get; set; } = string.Empty;
     [Required]

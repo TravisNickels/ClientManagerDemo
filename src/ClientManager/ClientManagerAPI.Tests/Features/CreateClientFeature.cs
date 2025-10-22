@@ -5,6 +5,7 @@ using Testcontainers.PostgreSql;
 using FluentAssertions;
 using ClientManagerAPI.Repositories;
 using Moq;
+using ClientManagerAPI.Services;
 
 namespace ClientManagerAPI.Tests.Features;
 
@@ -63,7 +64,7 @@ internal class CreateClientFeature
         // Given a new valid client
         var newClient = new Client
         {
-            Id = 1,
+            Id = Guid.Empty,
             FirstName = "Luke",
             LastName = "Skywalker",
             Email = "luke.skywalker@ghmail.com"
@@ -83,7 +84,7 @@ internal class CreateClientFeature
         // Given a new client without an email
         var newClient = new Client
         {
-            Id = 2,
+            Id = Guid.Empty,
             FirstName = null,
             LastName = "Solo",
             Email = "han.solo@gmail.com"
@@ -124,7 +125,7 @@ internal class CreateClientFeature
         savedClient.Should().NotBeNull();
         savedClient.Id.Should().NotBe(Guid.Empty, "the service should assign a GUID before saving");
 
-        result.Id.Should().be(savedClient.Id);
+        result.Id.Should().Be(savedClient.Id);
         //savedClient.Id.Should().BeGreaterThan(0);
     }
 }
