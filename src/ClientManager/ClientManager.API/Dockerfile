@@ -11,19 +11,19 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ClientManagerAPI/ClientManagerAPI.csproj", "ClientManagerAPI/"]
-RUN dotnet restore "./ClientManagerAPI/ClientManagerAPI.csproj"
+COPY ["ClientManager.API/ClientManager.API.csproj", "ClientManagerAPI/"]
+RUN dotnet restore "./ClientManager.API/ClientManager.API.csproj"
 COPY . .
-WORKDIR "/src/ClientManagerAPI"
-RUN dotnet build "./ClientManagerAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/ClientManager.API"
+RUN dotnet build "./ClientManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ClientManagerAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./ClientManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ClientManagerAPI.dll"]
+ENTRYPOINT ["dotnet", "ClientManager.API.dll"]
