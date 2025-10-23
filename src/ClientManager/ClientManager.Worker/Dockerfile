@@ -10,16 +10,18 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ClientManager.Worker.csproj", "./"]
-RUN dotnet restore "./ClientManager.Worker.csproj"
-COPY . .
+COPY ["./ClientManager.Worker/ClientManager.Worker.csproj", "ClientManager.Worker/"]
+COPY ["../ClientManager.Shared/ClientManager.Shared.csproj", "ClientManager.Shared/"]
+RUN dotnet restore "./ClientManager.Worker/ClientManager.Worker.csproj"
+COPY ./ClientManager.Worker ./ClientManager.Worker
+COPY ../ClientManager.Shared ../ClientManager.Shared
 WORKDIR "/src"
-RUN dotnet build "./ClientManager.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./ClientManager.Worker/ClientManager.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ClientManager.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./ClientManager.Worker/ClientManager.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

@@ -30,8 +30,8 @@ services:
 
   api:
     build:
-      context: ./ClientManager/ClientManager.API
-      dockerfile: Dockerfile
+      context: ./ClientManager
+      dockerfile: ClientManager.API/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,8 +43,8 @@ services:
 
   worker:
     build:
-      context: ./ClientManager/ClientManager.Worker
-      dockerfile: Dockerfile
+      context: ./ClientManager
+      dockerfile: ClientManager.Worker/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
