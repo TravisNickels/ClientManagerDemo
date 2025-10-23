@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
-using ClientManager.API.Data;
+using ClientManager.Worker.Data;
 using FluentAssertions;
 
 namespace ClientManager.API.Tests.Integration.Database;
