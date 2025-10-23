@@ -1,7 +1,7 @@
 ﻿using dotenv.net;
 using Npgsql;
 
-namespace ClientManager.API.Config;
+namespace ClientManager.Worker.Config;
 
 public class DatabaseConfig()
 {

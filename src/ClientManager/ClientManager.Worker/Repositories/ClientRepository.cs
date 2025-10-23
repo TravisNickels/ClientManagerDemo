@@ -1,7 +1,7 @@
-﻿using ClientManager.API.Data;
-using ClientManager.API.Models;
+﻿using ClientManager.Worker.Data;
+using ClientManager.Shared.Models;
 
-namespace ClientManager.API.Repositories;
+namespace ClientManager.Worker.Repositories;
 
 public class ClientRepository(AppDbContext appDbContext) : IClientRepository
 {

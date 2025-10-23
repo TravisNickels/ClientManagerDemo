@@ -1,7 +1,7 @@
-﻿using ClientManager.API.Models;
+﻿using ClientManager.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClientManager.API.Data;
+namespace ClientManager.Worker.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

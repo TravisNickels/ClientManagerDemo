@@ -1,6 +1,6 @@
-﻿using ClientManager.API.Models;
+﻿using ClientManager.Shared.Models;
 
-namespace ClientManager.API.Repositories;
+namespace ClientManager.Worker.Repositories;
 
 public interface IClientRepository
 {
