@@ -3,7 +3,7 @@ using Testcontainers.PostgreSql;
 using ClientManager.Worker.Data;
 using FluentAssertions;
 
-namespace ClientManager.API.Tests.Integration.Database;
+namespace ClientManager.Worker.Tests.Integration.Database;
 
 [TestFixture]
 internal class PostgresContainerTests

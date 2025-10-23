@@ -6,7 +6,7 @@ using FluentAssertions;
 using ClientManager.Worker.Repositories;
 using Testcontainers.RabbitMq;
 
-namespace ClientManager.API.Tests.Features;
+namespace ClientManager.Worker.Tests.Features;
 
 [TestFixture]
 internal class CreateClientFeature
