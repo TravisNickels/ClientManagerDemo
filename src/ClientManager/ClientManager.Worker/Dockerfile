@@ -11,10 +11,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["./ClientManager.Worker/ClientManager.Worker.csproj", "ClientManager.Worker/"]
-COPY ["../ClientManager.Shared/ClientManager.Shared.csproj", "ClientManager.Shared/"]
+COPY ["./ClientManager.Shared/ClientManager.Shared.csproj", "ClientManager.Shared/"]
 RUN dotnet restore "./ClientManager.Worker/ClientManager.Worker.csproj"
 COPY ./ClientManager.Worker ./ClientManager.Worker
-COPY ../ClientManager.Shared ../ClientManager.Shared
+COPY ./ClientManager.Shared ./ClientManager.Shared
 WORKDIR "/src"
 RUN dotnet build "./ClientManager.Worker/ClientManager.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
