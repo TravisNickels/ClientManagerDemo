@@ -6,33 +6,35 @@ using FluentAssertions;
 using ClientManager.API.Repositories;
 using Moq;
 using ClientManager.API.Services;
+using Testcontainers.RabbitMq;
 
-namespace ClientManagerAPI.Tests.Features;
+namespace ClientManager.API.Tests.Features;
 
 [TestFixture]
 internal class CreateClientFeature
 {
-    PostgreSqlContainer _container = null!;
+    PostgreSqlContainer _postgresContainer = null!;
+    RabbitMqContainer _rabbitMqConatiner = null!;
     AppDbContext _dbContext = null!;
     ClientRepository _clientRepository = null!;
 
     [OneTimeSetUp]
     public async Task CreatePostgresContainer()
     {
-        _container = new PostgreSqlBuilder()
+        _postgresContainer = new PostgreSqlBuilder()
             .WithDatabase("clientManagerTestDb")
             .WithUsername("postgres")
             .WithPassword("postgres")
             .Build();
 
-        await _container.StartAsync();
+        await _postgresContainer.StartAsync();
     }
 
     [OneTimeTearDown]
     public async Task DisposeAsync()
     {
-        if (_container is not null)
-            await _container.DisposeAsync();
+        if (_postgresContainer is not null)
+            await _postgresContainer.DisposeAsync();
         if (_dbContext is not null)
             await _dbContext.DisposeAsync();
     }
@@ -41,7 +43,7 @@ internal class CreateClientFeature
     public void CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-           .UseNpgsql(_container.GetConnectionString())
+           .UseNpgsql(_postgresContainer.GetConnectionString())
            .Options;
 
         _dbContext = new AppDbContext(options);
@@ -49,6 +51,7 @@ internal class CreateClientFeature
         _dbContext.Database.EnsureCreated();
 
         _clientRepository = new ClientRepository(_dbContext);
+
     }
 
     [TearDown]
@@ -127,6 +130,21 @@ internal class CreateClientFeature
         savedClient.Id.Should().NotBe(Guid.Empty, "the service should assign a GUID before saving");
 
         result.Id.Should().Be(savedClient.Id);
+    }
+
+    [Test]
+    public async Task When_Creating_A_Valid_Client_The_Service_Should_Enqueue_It_For_Saving()
+    {
+        // Given a new valid client
+        var newClient = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "Anakin",
+            LastName = "Skywalker",
+            Email = "Anakin.Skywalker@gmail.com"
+        };
+
+
     }
 }
 

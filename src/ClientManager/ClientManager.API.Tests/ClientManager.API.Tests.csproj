@@ -24,6 +24,7 @@
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.8.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>
