@@ -30,13 +30,24 @@ services:
 
   api:
     build:
-      context: ./ClientManager/ClientManager.api
+      context: ./ClientManager/ClientManager.API
       dockerfile: Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
     ports:
       - "5000:80"
+    restart: always
+    environment:
+      - POSTGRES_HOST=postgres
+
+  worker:
+    build:
+      context: ./ClientManager/ClientManager.Worker
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: always
     environment:
       - POSTGRES_HOST=postgres
