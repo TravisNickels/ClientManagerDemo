@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientManager.Worker", "Cli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientManager.Shared", "ClientManager.Shared\ClientManager.Shared.csproj", "{36D67731-5770-4397-8FF6-ADF41F4DC9AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientManager.Worker.Tests", "ClientManager.Worker.Tests\ClientManager.Worker.Tests.csproj", "{A614AC72-10C7-42C1-8FC6-599603E335E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{36D67731-5770-4397-8FF6-ADF41F4DC9AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36D67731-5770-4397-8FF6-ADF41F4DC9AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36D67731-5770-4397-8FF6-ADF41F4DC9AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A614AC72-10C7-42C1-8FC6-599603E335E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A614AC72-10C7-42C1-8FC6-599603E335E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A614AC72-10C7-42C1-8FC6-599603E335E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A614AC72-10C7-42C1-8FC6-599603E335E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
