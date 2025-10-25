@@ -1,4 +1,5 @@
-﻿using dotenv.net;
+﻿using ClientManager.Shared.Config;
+using dotenv.net;
 using Npgsql;
 
 namespace ClientManager.Worker.Config;
@@ -28,51 +29,38 @@ public class DatabaseConfig()
         if (File.Exists(envPath))
         {
             DotEnv.Load(new DotEnvOptions(envFilePaths: [envPath]));
-        } else {
+        }
+        else
+        {
             Console.WriteLine($"Warning: .env file not found at {envPath}. Using appsettings.json for environment variables or default database configuration.");
         }
 
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(basePath)
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddEnvironmentVariables()
-            .Build();
+        var configuration = new ConfigurationBuilder().SetBasePath(basePath).AddJsonFile("appsettings.json", optional: true, reloadOnChange: false).AddEnvironmentVariables().Build();
 
         return new DatabaseConfig
         {
-            Host = Environment.GetEnvironmentVariable("POSTGRES_HOST")
-                ?? configuration["DatabaseConfig:POSTGRES_HOST"]
-                ?? "localhost",
-            Port = int.TryParse(
-                Environment.GetEnvironmentVariable("POSTGRES_PORT")
-                ?? configuration["DatabaseConfig:POSTGRES_PORT"], out var port) ? port : 5432,
-            Database = Environment.GetEnvironmentVariable("POSTGRES_DATABASE")
-                ?? configuration["DatabaseConfig:POSTGRES_DATABASE"]
-                ?? "clientManagerDB",
-            Username = Environment.GetEnvironmentVariable("POSTGRES_USER") 
-                ?? configuration["DatabaseConfig:POSTGRES_USER"]
-                ?? "postgres",
-            Password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") 
-                ?? configuration["DatabaseConfig:POSTGRES_PASSWORD"]
-                ?? "postgres",
-            Schema = Environment.GetEnvironmentVariable("POSTGRES_SCHEMA")
-                ?? configuration["DatabaseConfig:POSTGRES_SCHEMA"]
-                ?? "public"
+            Host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? configuration["DatabaseConfig:POSTGRES_HOST"] ?? "localhost",
+            Port = int.TryParse(Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? configuration["DatabaseConfig:POSTGRES_PORT"], out var port) ? port : 5432,
+            Database = Environment.GetEnvironmentVariable("POSTGRES_DATABASE") ?? configuration["DatabaseConfig:POSTGRES_DATABASE"] ?? "clientManagerDB",
+            Username = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? configuration["DatabaseConfig:POSTGRES_USER"] ?? "postgres",
+            Password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? configuration["DatabaseConfig:POSTGRES_PASSWORD"] ?? "postgres",
+            Schema = Environment.GetEnvironmentVariable("POSTGRES_SCHEMA") ?? configuration["DatabaseConfig:POSTGRES_SCHEMA"] ?? "public"
         };
     }
 
     public string ToConnectionString() => ToConnectionStringBuilder().ConnectionString;
 
-    public NpgsqlConnectionStringBuilder ToConnectionStringBuilder() => new()
-    {
-        Host = Host,
-        Port = Port,
-        Database = Database,
-        Username = Username,
-        Password = Password,
-        SearchPath = Schema
-    };
-    
+    public NpgsqlConnectionStringBuilder ToConnectionStringBuilder() =>
+        new()
+        {
+            Host = Host,
+            Port = Port,
+            Database = Database,
+            Username = Username,
+            Password = Password,
+            SearchPath = Schema
+        };
+
     public void TestConnection()
     {
         try
