@@ -1,9 +1,9 @@
-﻿using ClientManager.Worker.Data;
-using ClientManager.Shared.Models;
+﻿using ClientManager.Shared.Models;
+using ClientManager.Worker.Data;
+using ClientManager.Worker.Repositories;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
-using FluentAssertions;
-using ClientManager.Worker.Repositories;
 using Testcontainers.RabbitMq;
 
 namespace ClientManager.Worker.Tests.Features;
@@ -12,7 +12,8 @@ namespace ClientManager.Worker.Tests.Features;
 internal class CreateClientFeature
 {
     PostgreSqlContainer _postgresContainer = null!;
-    RabbitMqContainer _rabbitMqConatiner = null!;
+
+    //RabbitMqContainer _rabbitMqConatiner = null!;
     AppDbContext _dbContext = null!;
     ClientRepository _clientRepository = null!;
 
@@ -41,15 +42,14 @@ internal class CreateClientFeature
     public void CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-           .UseNpgsql(_postgresContainer.GetConnectionString())
-           .Options;
+            .UseNpgsql(_postgresContainer.GetConnectionString())
+            .Options;
 
         _dbContext = new AppDbContext(options);
 
         _dbContext.Database.EnsureCreated();
 
         _clientRepository = new ClientRepository(_dbContext);
-
     }
 
     [TearDown]
@@ -92,14 +92,17 @@ internal class CreateClientFeature
         };
 
         // When saving the client to the database
-        Func<Task> act = async () => { await _clientRepository.AddAsync(newClient); };
+        Func<Task> act = async () =>
+        {
+            await _clientRepository.AddAsync(newClient);
+        };
 
         // Then a DbUpdateException should be thrown
         await act.Should().ThrowAsync<DbUpdateException>();
     }
 
     [Test]
-    public async Task When_Creating_A_Valid_Client_The_Service_Should_Enqueue_It_For_Saving()
+    public void When_Creating_A_Valid_Client_The_Service_Should_Enqueue_It_For_Saving()
     {
         // Given a new valid client
         var newClient = new Client
@@ -109,8 +112,5 @@ internal class CreateClientFeature
             LastName = "Skywalker",
             Email = "Anakin.Skywalker@gmail.com"
         };
-
-
     }
 }
-
