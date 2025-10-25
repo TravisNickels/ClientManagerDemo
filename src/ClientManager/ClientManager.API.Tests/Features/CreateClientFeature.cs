@@ -38,14 +38,6 @@ internal class CreateClientFeature
             password: "guest"
         );
 
-        client = new Client
-        {
-            Id = Guid.Empty,
-            FirstName = "Luke",
-            LastName = "Skywalker",
-            Email = "Luke.Skywalker@gmail.com"
-        };
-
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _queuePublisher = new QueuePublisher(_messageBrokerFactory);
     }
@@ -58,6 +50,18 @@ internal class CreateClientFeature
 
         if (_messageBrokerFactory is not null)
             await _messageBrokerFactory.DisposeAsync();
+    }
+
+    [SetUp]
+    public void Setup()
+    {
+        client = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "Luke",
+            LastName = "Skywalker",
+            Email = "Luke.Skywalker@gmail.com"
+        };
     }
 
     [Test]
