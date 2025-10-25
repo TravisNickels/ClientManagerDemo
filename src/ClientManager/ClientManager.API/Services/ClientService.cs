@@ -1,18 +1,27 @@
-﻿//using ClientManager.API.Models;
-//using ClientManager.API.Repositories;
+﻿using System.Text.Json;
+using ClientManager.Shared.Messaging;
+using ClientManager.Shared.Models;
 
-//namespace ClientManager.API.Services;
+namespace ClientManager.API.Services;
 
-//public class ClientService(IClientRepository clientRepository)
-//{
-//    IClientRepository _clientRepository = clientRepository;
+public class ClientService(IMessageBroker broker) : IClientService
+{
+    IMessageBroker _messageBroker = broker;
 
-//    public async Task<Client> CreateClientAsync(Client client)
-//    {
-//        if (client.Id == Guid.Empty)
-//            client.Id = Guid.NewGuid();
+    public async Task<bool> SendCreateClientMessage(Client client, string queueName = "test-queue")
+    {
+        if (client.Id == Guid.Empty)
+            client.Id = Guid.NewGuid();
 
-//        return await _clientRepository.AddAsync(client);
-//    }
-//}
-
+        var body = JsonSerializer.SerializeToUtf8Bytes(client);
+        try
+        {
+            await _messageBroker.SendToQueue(queueName, body, "MyExchange", "CorrectKey");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+}
