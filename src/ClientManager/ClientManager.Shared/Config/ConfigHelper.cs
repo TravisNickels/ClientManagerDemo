@@ -1,4 +1,4 @@
-﻿namespace ClientManager.API.Config;
+﻿namespace ClientManager.Shared.Config;
 
 public class ConfigHelper
 {
@@ -17,4 +17,3 @@ public class ConfigHelper
         return null;
     }
 }
-
