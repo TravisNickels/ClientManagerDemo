@@ -3,6 +3,7 @@ using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
 using FluentAssertions;
+using Moq;
 using Testcontainers.RabbitMq;
 
 namespace ClientManager.API.Tests.Features;
@@ -111,5 +112,23 @@ internal class CreateClientFeature
 
         // Then it should throw a domain validation exception
         await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
+    }
+
+    [Test]
+    public async Task When_QueuePublisher_Fails_The_Service_Should_Throw()
+    {
+        // Given a mock queue publisher that throws an exception
+        var mockPublisher = new Mock<IQueuePublisher>();
+        mockPublisher
+            .Setup(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ThrowsAsync(new Exception("Broker down"));
+
+        // When sending the create client message
+        var clientService = new ClientService(mockPublisher.Object);
+        var newClient = client;
+
+        // Then it should throw an InvalidOperationException with inner exception message
+        var ex = await FluentActions.Invoking(() => clientService.SendCreateClientMessage(client)).Should().ThrowAsync<InvalidOperationException>();
+        ex.Which.InnerException!.Message.Should().Contain("Broker down");
     }
 }
