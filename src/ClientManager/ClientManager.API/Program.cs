@@ -1,3 +1,4 @@
+using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IMessageBroker>(bf => new MessageBrokerFactory("amqp://localhost", 5672));
+builder.Services.AddSingleton<IMessageBroker>(bf =>
+{
+    var connectionConfiguration = RabbitMQConnectionConfiguration.Load();
+    return new MessageBrokerFactory(connectionConfiguration);
+});
 
 var app = builder.Build();
 
