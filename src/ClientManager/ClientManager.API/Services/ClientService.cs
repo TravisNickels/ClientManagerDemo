@@ -10,6 +10,15 @@ public class ClientService(IQueuePublisher publisher) : IClientService
 
     public async Task<bool> SendCreateClientMessage(Client client, string queueName = "test-queue")
     {
+        if (string.IsNullOrWhiteSpace(client.FirstName))
+            throw new ArgumentException("Client must have a first name.", nameof(client.FirstName));
+
+        if (string.IsNullOrWhiteSpace(client.LastName))
+            throw new ArgumentException("Client must have a last name.", nameof(client.LastName));
+
+        if (string.IsNullOrWhiteSpace(client.Email))
+            throw new ArgumentException("Client must have an email.", nameof(client.Email));
+
         if (client.Id == Guid.Empty)
             client.Id = Guid.NewGuid();
 
@@ -21,7 +30,7 @@ public class ClientService(IQueuePublisher publisher) : IClientService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new InvalidOperationException("Failed to enqueue client message.", ex);
         }
     }
 }
