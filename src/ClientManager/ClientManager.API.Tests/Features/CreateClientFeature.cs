@@ -69,4 +69,58 @@ internal class CreateClientFeature
         // Then the client should be enqueued successfully
         result.Should().BeTrue();
     }
+
+    [Test]
+    public async Task When_Creating_Client_With_No_First_Name_The_Service_Should_Throw()
+    {
+        // Given an invalid client (missing first)
+        var invalidClient = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "",
+            LastName = "Skywalker",
+            Email = "skywalker@gmail.com"
+        };
+
+        var clientService = new ClientService(_queuePublisher);
+
+        // Then it should throw a domain validation exception
+        await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
+    }
+
+    [Test]
+    public async Task When_Creating_Client_With_No_Last_Name_The_Service_Should_Throw()
+    {
+        // Given an invalid client (missing first)
+        var invalidClient = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "Luke",
+            LastName = "",
+            Email = "luke@gmail.com"
+        };
+
+        var clientService = new ClientService(_queuePublisher);
+
+        // Then it should throw a domain validation exception
+        await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
+    }
+
+    [Test]
+    public async Task When_Creating_Client_With_No_Email_The_Service_Should_Throw()
+    {
+        // Given an invalid client (missing first)
+        var invalidClient = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "Luke",
+            LastName = "Skywalker",
+            Email = ""
+        };
+
+        var clientService = new ClientService(_queuePublisher);
+
+        // Then it should throw a domain validation exception
+        await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
+    }
 }
