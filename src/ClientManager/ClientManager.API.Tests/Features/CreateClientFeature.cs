@@ -12,6 +12,7 @@ internal class CreateClientFeature
 {
     RabbitMqContainer _rabbitMqConatiner = null!;
     MessageBrokerFactory _messageBrokerFactory = null!;
+    QueuePublisher _queuePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
 
     [OneTimeSetUp]
@@ -36,6 +37,7 @@ internal class CreateClientFeature
         );
 
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
+        _queuePublisher = new QueuePublisher(_messageBrokerFactory);
     }
 
     [OneTimeTearDown]
@@ -61,7 +63,7 @@ internal class CreateClientFeature
         };
 
         // When sending the create client message
-        var clientService = new ClientService(_messageBrokerFactory);
+        var clientService = new ClientService(_queuePublisher);
         var result = await clientService.SendCreateClientMessage(newClient);
 
         // Then the client should be enqueued successfully

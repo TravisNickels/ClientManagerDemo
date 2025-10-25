@@ -4,9 +4,9 @@ using ClientManager.Shared.Models;
 
 namespace ClientManager.API.Services;
 
-public class ClientService(IMessageBroker broker) : IClientService
+public class ClientService(IQueuePublisher publisher) : IClientService
 {
-    IMessageBroker _messageBroker = broker;
+    IQueuePublisher _queuePublisher = publisher;
 
     public async Task<bool> SendCreateClientMessage(Client client, string queueName = "test-queue")
     {
@@ -16,7 +16,7 @@ public class ClientService(IMessageBroker broker) : IClientService
         var body = JsonSerializer.SerializeToUtf8Bytes(client);
         try
         {
-            await _messageBroker.SendToQueue(queueName, body, "MyExchange", "CorrectKey");
+            await _queuePublisher.PublishToQueueAsync(queueName, body, "MyExchange", "CorrectKey");
             return true;
         }
         catch (Exception ex)
