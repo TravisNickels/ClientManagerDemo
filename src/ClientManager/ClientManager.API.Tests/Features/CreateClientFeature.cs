@@ -1,6 +1,8 @@
 ﻿using ClientManager.API.Services;
+using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
+using Docker.DotNet.Models;
 using FluentAssertions;
 using Testcontainers.RabbitMq;
 
@@ -11,6 +13,7 @@ internal class CreateClientFeature
 {
     RabbitMqContainer _rabbitMqConatiner = null!;
     MessageBrokerFactory _messageBrokerFactory = null!;
+    RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
 
     [OneTimeSetUp]
     public async Task CreateRabbitMqContainer()
@@ -18,16 +21,22 @@ internal class CreateClientFeature
         _rabbitMqConatiner = new RabbitMqBuilder()
             .WithUsername("guest")
             .WithPassword("guest")
-            .WithExposedPort("5672")
+            .WithExposedPort("5672") // amqp port
+            .WithPortBinding("15672", true) // management port
             .WithCleanUp(true)
             .Build();
         await _rabbitMqConatiner.StartAsync();
 
-        var connectionString = _rabbitMqConatiner.GetConnectionString();
-        var hostname = _rabbitMqConatiner.Hostname;
-        var port = _rabbitMqConatiner.GetMappedPublicPort(5672);
+        _rabbitMqConnectionConfiguration = new RabbitMQConnectionConfiguration(
+            url: _rabbitMqConatiner.GetConnectionString(),
+            amqpPort: _rabbitMqConatiner.GetMappedPublicPort(5672),
+            managementPort: _rabbitMqConatiner.GetMappedPublicPort(15672),
+            virtualHost: "/",
+            username: "guest",
+            password: "guest"
+        );
 
-        _messageBrokerFactory = new MessageBrokerFactory(connectionString, port);
+        _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
     }
 
     [OneTimeTearDown]
