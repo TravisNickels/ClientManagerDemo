@@ -2,7 +2,6 @@
 using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
-using Docker.DotNet.Models;
 using FluentAssertions;
 using Testcontainers.RabbitMq;
 
@@ -44,6 +43,9 @@ internal class CreateClientFeature
     {
         if (_rabbitMqConatiner is not null)
             await _rabbitMqConatiner.DisposeAsync();
+
+        if (_messageBrokerFactory is not null)
+            await _messageBrokerFactory.DisposeAsync();
     }
 
     [Test]
