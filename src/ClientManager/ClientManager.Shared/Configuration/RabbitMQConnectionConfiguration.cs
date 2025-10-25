@@ -31,7 +31,7 @@ public class RabbitMQConnectionConfiguration(string url, int amqpPort, int manag
     {
         basePath ??= AppContext.BaseDirectory;
 
-        var envPath = ConfigHelper.FindEnvFile(basePath);
+        var envPath = ConfigurationHelper.FindEnvFile(basePath);
         if (File.Exists(envPath))
         {
             DotEnv.Load(new DotEnvOptions(envFilePaths: [envPath]));

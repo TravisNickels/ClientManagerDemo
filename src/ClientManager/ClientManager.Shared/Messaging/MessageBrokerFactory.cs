@@ -40,6 +40,7 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
     {
         _connection = await GetConnectionAsync();
 
+        // TODO: Determine if this is needed to override defaults or passed in options
         options ??= new CreateChannelOptions(publisherConfirmationsEnabled: true, publisherConfirmationTrackingEnabled: true, outstandingPublisherConfirmationsRateLimiter: new ThrottlingRateLimiter(1000));
 
         if (!_channels.TryGetValue(channelName, out var channel))
