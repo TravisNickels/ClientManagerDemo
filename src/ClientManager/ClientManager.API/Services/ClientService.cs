@@ -8,29 +8,35 @@ public class ClientService(IQueuePublisher publisher) : IClientService
 {
     IQueuePublisher _queuePublisher = publisher;
 
-    public async Task<bool> SendCreateClientMessage(Client client, string queueName = "test-queue")
+    public async Task<bool> SendCreateClientMessage(Client client, string queueName = "clients", string exchange = "client-manager", string routingKey = "")
     {
-        if (string.IsNullOrWhiteSpace(client.FirstName))
-            throw new ArgumentException("Client must have a first name.", nameof(client.FirstName));
+        ValidateClient(client);
 
-        if (string.IsNullOrWhiteSpace(client.LastName))
-            throw new ArgumentException("Client must have a last name.", nameof(client.LastName));
-
-        if (string.IsNullOrWhiteSpace(client.Email))
-            throw new ArgumentException("Client must have an email.", nameof(client.Email));
-
-        if (client.Id == Guid.Empty)
-            client.Id = Guid.NewGuid();
+        if (string.IsNullOrWhiteSpace(routingKey))
+            routingKey = queueName;
 
         var body = JsonSerializer.SerializeToUtf8Bytes(client);
         try
         {
-            await _queuePublisher.PublishAsync(queueName, body, "MyExchange", "CorrectKey");
+            await _queuePublisher.PublishAsync(queueName, body, exchange, routingKey);
             return true;
         }
         catch (Exception ex)
         {
             throw new InvalidOperationException("Failed to enqueue client message.", ex);
         }
+    }
+
+    void ValidateClient(Client client)
+    {
+        if (string.IsNullOrWhiteSpace(client.FirstName))
+            throw new ArgumentException("Client must have a first name.", nameof(client.FirstName));
+        if (string.IsNullOrWhiteSpace(client.LastName))
+            throw new ArgumentException("Client must have a last name.", nameof(client.LastName));
+        if (string.IsNullOrWhiteSpace(client.Email))
+            throw new ArgumentException("Client must have an email.", nameof(client.Email));
+
+        if (client.Id == Guid.Empty)
+            client.Id = Guid.NewGuid();
     }
 }
