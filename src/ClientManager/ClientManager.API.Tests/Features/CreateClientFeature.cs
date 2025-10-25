@@ -65,7 +65,7 @@ internal class CreateClientFeature
     }
 
     [Test]
-    public async Task When_Creating_A_Valid_Client_With_Empty_Id_The_Service_Should_AutoGenerateId_And_Enqueue_It_For_Saving()
+    public async Task When_Creating_Client_With_Empty_Id_The_Service_Should_AutoGenerateId_And_Enqueue_It_For_Saving()
     {
         // Given a new valid client
         var newClient = client;
