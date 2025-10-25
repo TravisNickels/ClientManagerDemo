@@ -1,11 +1,12 @@
 ﻿using System.Buffers.Binary;
 using System.Collections.Concurrent;
+using ClientManager.Shared.Configuration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace ClientManager.Shared.Messaging;
 
-public class MessageBrokerFactory(string url = "amqp://localhost", int amqpPort = 5672) : IMessageBroker
+public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnectionConfiguration) : IMessageBroker
 {
     IConnection? _connection;
     ConcurrentDictionary<string, IChannel> _channels = [];
@@ -16,7 +17,15 @@ public class MessageBrokerFactory(string url = "amqp://localhost", int amqpPort 
     int confirmedCount = 0;
     const bool debug = true;
 
-    readonly ConnectionFactory _connectionFactory = new() { Uri = new Uri(url), Port = amqpPort, };
+    readonly ConnectionFactory _connectionFactory =
+        new()
+        {
+            Uri = new Uri(rabbitMQConnectionConfiguration.Url),
+            Port = rabbitMQConnectionConfiguration.AmqpPort,
+            VirtualHost = rabbitMQConnectionConfiguration.VirtualHost,
+            UserName = rabbitMQConnectionConfiguration.Username,
+            Password = rabbitMQConnectionConfiguration.Password
+        };
 
     public async ValueTask<IConnection> GetConnectionAsync()
     {
