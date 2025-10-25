@@ -14,6 +14,7 @@ internal class CreateClientFeature
     MessageBrokerFactory _messageBrokerFactory = null!;
     QueuePublisher _queuePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
+    Client client = null!;
 
     [OneTimeSetUp]
     public async Task CreateRabbitMqContainer()
@@ -36,6 +37,14 @@ internal class CreateClientFeature
             password: "guest"
         );
 
+        client = new Client
+        {
+            Id = Guid.Empty,
+            FirstName = "Luke",
+            LastName = "Skywalker",
+            Email = "Luke.Skywalker@gmail.com"
+        };
+
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _queuePublisher = new QueuePublisher(_messageBrokerFactory);
     }
@@ -51,16 +60,10 @@ internal class CreateClientFeature
     }
 
     [Test]
-    public async Task When_Creating_A_Valid_Client_The_Service_Should_Enqueue_It_For_Saving()
+    public async Task When_Creating_A_Valid_Client_With_Empty_Id_The_Service_Should_AutoGenerateId_And_Enqueue_It_For_Saving()
     {
         // Given a new valid client
-        var newClient = new Client
-        {
-            Id = Guid.Empty,
-            FirstName = "Anakin",
-            LastName = "Skywalker",
-            Email = "Anakin.Skywalker@gmail.com"
-        };
+        var newClient = client;
 
         // When sending the create client message
         var clientService = new ClientService(_queuePublisher);
@@ -68,19 +71,15 @@ internal class CreateClientFeature
 
         // Then the client should be enqueued successfully
         result.Should().BeTrue();
+        client.Id.Should().NotBe(Guid.Empty);
     }
 
     [Test]
     public async Task When_Creating_Client_With_No_First_Name_The_Service_Should_Throw()
     {
         // Given an invalid client (missing first)
-        var invalidClient = new Client
-        {
-            Id = Guid.Empty,
-            FirstName = "",
-            LastName = "Skywalker",
-            Email = "skywalker@gmail.com"
-        };
+        var invalidClient = client;
+        invalidClient.FirstName = "";
 
         var clientService = new ClientService(_queuePublisher);
 
@@ -92,13 +91,8 @@ internal class CreateClientFeature
     public async Task When_Creating_Client_With_No_Last_Name_The_Service_Should_Throw()
     {
         // Given an invalid client (missing first)
-        var invalidClient = new Client
-        {
-            Id = Guid.Empty,
-            FirstName = "Luke",
-            LastName = "",
-            Email = "luke@gmail.com"
-        };
+        var invalidClient = client;
+        invalidClient.LastName = "";
 
         var clientService = new ClientService(_queuePublisher);
 
@@ -110,13 +104,8 @@ internal class CreateClientFeature
     public async Task When_Creating_Client_With_No_Email_The_Service_Should_Throw()
     {
         // Given an invalid client (missing first)
-        var invalidClient = new Client
-        {
-            Id = Guid.Empty,
-            FirstName = "Luke",
-            LastName = "Skywalker",
-            Email = ""
-        };
+        var invalidClient = client;
+        invalidClient.Email = "";
 
         var clientService = new ClientService(_queuePublisher);
 
