@@ -9,11 +9,12 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IMessageBroker>(bf =>
+builder.Services.AddSingleton<IMessageBrokerFactory>(bf =>
 {
     var connectionConfiguration = RabbitMQConnectionConfiguration.Load();
     return new MessageBrokerFactory(connectionConfiguration);
 });
+builder.Services.AddScoped<IQueuePublisher, QueuePublisher>();
 
 var app = builder.Build();
 
