@@ -2,5 +2,5 @@
 
 public interface IQueuePublisher
 {
-    Task PublishToQueueAsync(string queueName, ReadOnlyMemory<byte> body, string exchange, string routingKey);
+    Task PublishAsync(string queueName, ReadOnlyMemory<byte> body, string exchange, string routingKey);
 }

@@ -16,7 +16,7 @@ public class ClientService(IQueuePublisher publisher) : IClientService
         var body = JsonSerializer.SerializeToUtf8Bytes(client);
         try
         {
-            await _queuePublisher.PublishToQueueAsync(queueName, body, "MyExchange", "CorrectKey");
+            await _queuePublisher.PublishAsync(queueName, body, "MyExchange", "CorrectKey");
             return true;
         }
         catch (Exception ex)

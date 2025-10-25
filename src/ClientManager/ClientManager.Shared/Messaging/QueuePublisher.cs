@@ -15,7 +15,7 @@ public class QueuePublisher(IMessageBrokerFactory messageBrokerFactory) : IQueue
     int confirmedCount = 0;
     const bool debug = true;
 
-    public async Task PublishToQueueAsync(string queueName, ReadOnlyMemory<byte> body, string exchange = "", string routingKey = "")
+    public async Task PublishAsync(string queueName, ReadOnlyMemory<byte> body, string exchange = "", string routingKey = "")
     {
         routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
         exchange = string.IsNullOrWhiteSpace(exchange) ? "client-manager" : exchange;
