@@ -1,6 +1,6 @@
-﻿namespace ClientManager.Shared.Config;
+﻿namespace ClientManager.Shared.Configuration;
 
-public class ConfigHelper
+public class ConfigurationHelper
 {
     public static string? FindEnvFile(string startDirectory)
     {
