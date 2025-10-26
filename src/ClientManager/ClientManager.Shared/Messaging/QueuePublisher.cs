@@ -69,10 +69,6 @@ public class QueuePublisher(IMessageBrokerFactory messageBrokerFactory) : IQueue
                 _ => 0
             };
         }
-        else
-        {
-            sequenceNumber = 0;
-        }
 
         Console.WriteLine(
             $"{DateTime.Now} [WARNING] message has been basic.return-ed: Exchange={args.Exchange}, RoutingKey={args.RoutingKey}, ReplyText={args.ReplyText}, SequenceNumber={sequenceNumber}"
