@@ -20,11 +20,7 @@ internal class CreateClientFeature
     [OneTimeSetUp]
     public async Task CreatePostgresContainer()
     {
-        _postgresContainer = new PostgreSqlBuilder()
-            .WithDatabase("clientManagerTestDb")
-            .WithUsername("postgres")
-            .WithPassword("postgres")
-            .Build();
+        _postgresContainer = new PostgreSqlBuilder().WithDatabase("clientManagerTestDb").WithUsername("postgres").WithPassword("postgres").Build();
 
         await _postgresContainer.StartAsync();
     }
@@ -41,9 +37,7 @@ internal class CreateClientFeature
     [SetUp]
     public void CreateDbContext()
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseNpgsql(_postgresContainer.GetConnectionString())
-            .Options;
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseNpgsql(_postgresContainer.GetConnectionString()).Options;
 
         _dbContext = new AppDbContext(options);
 
@@ -99,18 +93,5 @@ internal class CreateClientFeature
 
         // Then a DbUpdateException should be thrown
         await act.Should().ThrowAsync<DbUpdateException>();
-    }
-
-    [Test]
-    public void When_Creating_A_Valid_Client_The_Service_Should_Enqueue_It_For_Saving()
-    {
-        // Given a new valid client
-        var newClient = new Client
-        {
-            Id = Guid.Empty,
-            FirstName = "Anakin",
-            LastName = "Skywalker",
-            Email = "Anakin.Skywalker@gmail.com"
-        };
     }
 }
