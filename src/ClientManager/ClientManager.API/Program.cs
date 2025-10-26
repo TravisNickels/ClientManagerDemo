@@ -1,3 +1,4 @@
+using ClientManager.API.Services;
 using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
 
@@ -15,6 +16,7 @@ builder.Services.AddSingleton<IMessageBrokerFactory>(bf =>
     return new MessageBrokerFactory(connectionConfiguration);
 });
 builder.Services.AddScoped<IQueuePublisher, QueuePublisher>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 var app = builder.Build();
 
