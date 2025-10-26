@@ -9,7 +9,7 @@ public class ClientService(IQueuePublisher publisher) : IClientService
 {
     readonly IQueuePublisher _queuePublisher = publisher;
 
-    public async Task<bool> SendCreateClientMessage(Client client, string queueName = "clients", string exchange = "client-manager", string routingKey = "")
+    public async Task<Client> SendCreateClientMessage(Client client, string queueName = "clients", string exchange = "client-manager", string routingKey = "")
     {
         ValidateClient(client);
 
@@ -20,7 +20,7 @@ public class ClientService(IQueuePublisher publisher) : IClientService
         try
         {
             await _queuePublisher.PublishAsync(queueName, body, exchange, routingKey);
-            return true;
+            return client;
         }
         catch (Exception ex)
         {

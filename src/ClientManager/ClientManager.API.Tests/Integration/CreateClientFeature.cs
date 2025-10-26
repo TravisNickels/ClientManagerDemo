@@ -76,7 +76,8 @@ internal class CreateClientFeature
         var result = await clientService.SendCreateClientMessage(newClient);
 
         // Then the client should be enqueued successfully
-        result.Should().BeTrue();
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(client);
     }
 
     [Test]
@@ -112,7 +113,8 @@ internal class CreateClientFeature
         foreach (var client in clients)
         {
             var result = await clientService.SendCreateClientMessage(client);
-            result.Should().BeTrue();
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(client);
         }
     }
 }
