@@ -134,4 +134,28 @@ internal class ClientServiceTests
         deserialized.LastName.Should().Be("Skywalker");
         deserialized.Email.Should().Be("Luke.Skywalker@gmail.com");
     }
+
+    [Test]
+    public async Task When_Creating_Valid_Client_With_Empty_Id_The_Service_Should_Auto_Generate_Id()
+    {
+        // Given a mock queue publisher that captures the published body
+        ReadOnlyMemory<byte>? capturedBody = null;
+
+        var mockPublisher = new Mock<IQueuePublisher>();
+        mockPublisher
+            .Setup(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Callback<string, ReadOnlyMemory<byte>, string, string>((queue, body, exchange, routingKey) => capturedBody = body)
+            .Returns(Task.CompletedTask);
+
+        var clientService = new ClientService(mockPublisher.Object);
+
+        var newClient = client;
+
+        // When sending the create client message
+        await clientService.SendCreateClientMessage(newClient);
+
+        // Then the captured body should deserialize to the expected client with a non-empty Id
+        var deserialized = JsonSerializer.Deserialize<Client>(capturedBody!.Value.Span);
+        deserialized!.Id.Should().NotBe(Guid.Empty);
+    }
 }

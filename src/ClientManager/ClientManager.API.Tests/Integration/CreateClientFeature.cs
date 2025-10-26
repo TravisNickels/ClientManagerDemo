@@ -7,7 +7,7 @@ using FluentAssertions;
 using Moq;
 using Testcontainers.RabbitMq;
 
-namespace ClientManager.API.Tests.Features;
+namespace ClientManager.API.Tests.Integration;
 
 [TestFixture]
 internal class CreateClientFeature
@@ -66,7 +66,7 @@ internal class CreateClientFeature
     }
 
     [Test]
-    public async Task When_Creating_Client_With_Empty_Id_The_Service_Should_AutoGenerateId_And_Enqueue_It_For_Saving()
+    public async Task When_Creating_Client_The_Service_Should_Enqueue_It_For_Saving()
     {
         // Given a new valid client
         var newClient = client;
@@ -77,7 +77,6 @@ internal class CreateClientFeature
 
         // Then the client should be enqueued successfully
         result.Should().BeTrue();
-        client.Id.Should().NotBe(Guid.Empty);
     }
 
     [Test]
