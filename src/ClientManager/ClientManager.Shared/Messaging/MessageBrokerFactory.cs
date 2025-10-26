@@ -54,6 +54,8 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
         {
             await _connection.CloseAsync();
         }
+
+        GC.SuppressFinalize(this);
     }
 
     public ConnectionFactory GetConnectionFactory() => _connectionFactory;
