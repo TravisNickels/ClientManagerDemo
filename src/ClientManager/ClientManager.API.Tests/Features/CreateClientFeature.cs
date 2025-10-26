@@ -162,4 +162,41 @@ internal class CreateClientFeature
         deserialized.LastName.Should().Be("Skywalker");
         deserialized.Email.Should().Be("Luke.Skywalker@gmail.com");
     }
+
+    [Test]
+    public async Task When_Sending_Multiple_Clients_The_Service_Should_Enqueue_All_Successfully()
+    {
+        var clients = new[]
+        {
+            new Client
+            {
+                Id = Guid.Empty,
+                FirstName = "Anakin",
+                LastName = "Skywalker",
+                Email = "Anakin.Skywalker@gmail.com"
+            },
+            new Client
+            {
+                Id = Guid.Empty,
+                FirstName = "Leia",
+                LastName = "Organa",
+                Email = "Leia.Organa@gmail.com"
+            },
+            new Client
+            {
+                Id = Guid.Empty,
+                FirstName = "Luke",
+                LastName = "Skywalker",
+                Email = "luke.Skywalker@gmail.com"
+            }
+        };
+
+        var clientService = new ClientService(_queuePublisher);
+
+        foreach (var client in clients)
+        {
+            var result = await clientService.SendCreateClientMessage(client);
+            result.Should().BeTrue();
+        }
+    }
 }
