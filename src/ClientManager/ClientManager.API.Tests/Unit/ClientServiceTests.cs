@@ -14,15 +14,10 @@ internal class ClientServiceTests
     Client client = null!;
     Mock<IQueuePublisher> mockPublisher = null!;
 
-    [OneTimeSetUp]
-    public void OneTimeSetup()
-    {
-        mockPublisher = new Mock<IQueuePublisher>();
-    }
-
     [SetUp]
     public void Setup()
     {
+        mockPublisher = new Mock<IQueuePublisher>();
         client = new Client
         {
             Id = Guid.Empty,
@@ -92,7 +87,6 @@ internal class ClientServiceTests
     public async Task When_QueuePublisher_Fails_The_Service_Should_Throw()
     {
         // Given a mock queue publisher that throws an exception
-        var mockPublisher = new Mock<IQueuePublisher>();
         mockPublisher
             .Setup(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new Exception("Broker down"));
@@ -107,6 +101,7 @@ internal class ClientServiceTests
             .Should()
             .ThrowAsync<InvalidOperationException>()
             .Where(ex => ex.InnerException!.Message.Contains("Broker down"));
+        mockPublisher.Verify(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
     [Test]
@@ -115,7 +110,6 @@ internal class ClientServiceTests
         // Given a mock queue publisher that captures the published body
         ReadOnlyMemory<byte>? capturedBody = null;
 
-        var mockPublisher = new Mock<IQueuePublisher>();
         mockPublisher
             .Setup(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()))
             .Callback<string, ReadOnlyMemory<byte>, string, string>((queue, body, exchange, routingKey) => capturedBody = body)
@@ -129,6 +123,7 @@ internal class ClientServiceTests
         await clientService.SendCreateClientMessage(newClient);
 
         // Then the captured body should deserialize to the expected client
+        mockPublisher.Verify(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         var deserialized = JsonSerializer.Deserialize<Client>(capturedBody!.Value.Span);
         deserialized!.FirstName.Should().Be("Luke");
         deserialized.LastName.Should().Be("Skywalker");
@@ -141,7 +136,6 @@ internal class ClientServiceTests
         // Given a mock queue publisher that captures the published body
         ReadOnlyMemory<byte>? capturedBody = null;
 
-        var mockPublisher = new Mock<IQueuePublisher>();
         mockPublisher
             .Setup(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()))
             .Callback<string, ReadOnlyMemory<byte>, string, string>((queue, body, exchange, routingKey) => capturedBody = body)
@@ -155,6 +149,7 @@ internal class ClientServiceTests
         await clientService.SendCreateClientMessage(newClient);
 
         // Then the captured body should deserialize to the expected client with a non-empty Id
+        mockPublisher.Verify(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         var deserialized = JsonSerializer.Deserialize<Client>(capturedBody!.Value.Span);
         deserialized!.Id.Should().NotBe(Guid.Empty);
     }
