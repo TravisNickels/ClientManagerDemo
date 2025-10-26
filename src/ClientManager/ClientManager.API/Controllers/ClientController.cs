@@ -1,0 +1,33 @@
+﻿using ClientManager.API.Mappers;
+using ClientManager.API.Services;
+using ClientManager.Shared.DTOs.Requests;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ClientManager.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ClientController(IClientService clientService) : ControllerBase
+{
+    readonly IClientService _clientService = clientService;
+
+    [HttpPost]
+    public async Task<IActionResult> CreateClient([FromBody] CreateClientRequest createClientRequest)
+    {
+        if (createClientRequest is null)
+            return BadRequest("Client data is required");
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var client = await _clientService.SendCreateClientMessage(ClientMapper.ToEntity(createClientRequest), "create-client");
+            return AcceptedAtAction(nameof(CreateClient), nameof(ClientController), new { id = client.Id }, ClientMapper.ToResponse(client));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new InvalidOperationException($"Unexpected server error occurred sending message to broker. {ex.Message}", ex));
+        }
+    }
+}
