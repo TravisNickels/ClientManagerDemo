@@ -1,4 +1,5 @@
-﻿using ClientManager.API.Services;
+﻿using System.Text.Json;
+using ClientManager.API.Services;
 using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
@@ -132,7 +133,33 @@ internal class CreateClientFeature
         var newClient = client;
 
         // Then it should throw an InvalidOperationException with inner exception message
-        var ex = await FluentActions.Invoking(() => clientService.SendCreateClientMessage(client)).Should().ThrowAsync<InvalidOperationException>();
+        var ex = await FluentActions.Invoking(() => clientService.SendCreateClientMessage(newClient)).Should().ThrowAsync<InvalidOperationException>();
         ex.Which.InnerException!.Message.Should().Contain("Broker down");
+    }
+
+    [Test]
+    public async Task When_Creating_Valid_Client_The_Service_Should_Serialize_Payload_Correctly()
+    {
+        // Given a mock queue publisher that captures the published body
+        ReadOnlyMemory<byte>? capturedBody = null;
+
+        var mockPublisher = new Mock<IQueuePublisher>();
+        mockPublisher
+            .Setup(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Callback<string, ReadOnlyMemory<byte>, string, string>((queue, body, exchange, routingKey) => capturedBody = body)
+            .Returns(Task.CompletedTask);
+
+        var clientService = new ClientService(mockPublisher.Object);
+
+        var newClient = client;
+
+        // When sending the create client message
+        await clientService.SendCreateClientMessage(newClient);
+
+        // Then the captured body should deserialize to the expected client
+        var deserialized = JsonSerializer.Deserialize<Client>(capturedBody!.Value.Span);
+        deserialized!.FirstName.Should().Be("Luke");
+        deserialized.LastName.Should().Be("Skywalker");
+        deserialized.Email.Should().Be("Luke.Skywalker@gmail.com");
     }
 }
