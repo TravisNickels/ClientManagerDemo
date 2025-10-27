@@ -30,14 +30,15 @@ internal class CreateClientFeature
             .Build();
         await _rabbitMqConatiner.StartAsync();
 
-        _rabbitMqConnectionConfiguration = new RabbitMQConnectionConfiguration(
-            url: _rabbitMqConatiner.GetConnectionString(),
-            amqpPort: _rabbitMqConatiner.GetMappedPublicPort(5672),
-            managementPort: _rabbitMqConatiner.GetMappedPublicPort(15672),
-            virtualHost: "/",
-            username: "guest",
-            password: "guest"
-        );
+        _rabbitMqConnectionConfiguration = new RabbitMQConnectionConfiguration
+        {
+            Url = _rabbitMqConatiner.GetConnectionString(),
+            AmqpPort = _rabbitMqConatiner.GetMappedPublicPort(5672),
+            ManagementPort = _rabbitMqConatiner.GetMappedPublicPort(15672),
+            VirtualHost = "/",
+            Username = "guest",
+            Password = "guest"
+        };
 
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _queuePublisher = new QueuePublisher(_messageBrokerFactory);
