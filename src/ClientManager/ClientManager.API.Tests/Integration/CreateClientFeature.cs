@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Threading.Tasks;
 using ClientManager.API.Services;
 using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Messaging;
@@ -17,6 +18,9 @@ internal class CreateClientFeature
     QueuePublisher _queuePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
     Client client = null!;
+    string queueName = "create-client";
+    string exchangeName = "client-manager";
+    string routingKey = "create-client";
 
     [OneTimeSetUp]
     public async Task CreateRabbitMqContainer()
@@ -55,7 +59,7 @@ internal class CreateClientFeature
     }
 
     [SetUp]
-    public void Setup()
+    public async Task Setup()
     {
         client = new Client
         {
@@ -64,6 +68,8 @@ internal class CreateClientFeature
             LastName = "Skywalker",
             Email = "Luke.Skywalker@gmail.com"
         };
+
+        await _messageBrokerFactory.DeclareAndBindQueue(queueName: queueName, exchange: exchangeName, routingKey: routingKey);
     }
 
     [Test]
@@ -74,7 +80,7 @@ internal class CreateClientFeature
 
         // When sending the create client message
         var clientService = new ClientService(_queuePublisher);
-        var result = await clientService.SendCreateClientMessage(newClient);
+        var result = await clientService.SendCreateClientMessage(newClient, queueName, exchangeName, routingKey);
 
         // Then the client should be enqueued successfully
         result.Should().NotBeNull();
@@ -113,7 +119,7 @@ internal class CreateClientFeature
 
         foreach (var client in clients)
         {
-            var result = await clientService.SendCreateClientMessage(client);
+            var result = await clientService.SendCreateClientMessage(client, queueName, exchangeName, routingKey);
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(client);
         }
