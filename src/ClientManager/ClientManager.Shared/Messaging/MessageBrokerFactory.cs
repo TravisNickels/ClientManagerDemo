@@ -10,6 +10,13 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
 {
     IConnection? _connection;
     readonly ConcurrentDictionary<string, IChannel> _channels = [];
+    const string exchangeName = "client-manager";
+    readonly LinkedList<ulong> outstandingConfirms = new();
+    readonly SemaphoreSlim semaphore = new(1, 1);
+    readonly TaskCompletionSource<bool> allMessagesConfirmedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    const int MESSAGE_COUNT = 10000;
+    int confirmedCount = 0;
+    const bool debug = true;
 
     readonly ConnectionFactory _connectionFactory =
         new()
@@ -30,7 +37,7 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
         return _connection;
     }
 
-    public async ValueTask<IChannel> GetChannelAsync(string channelName, CreateChannelOptions? options = null)
+    public async ValueTask<IChannel> GetOrCreateChannelAsync(string channelName, CreateChannelOptions? options = null)
     {
         _connection = await GetConnectionAsync();
 
@@ -39,6 +46,106 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
             channel = await _connection.CreateChannelAsync(options);
             _channels.AddOrUpdate(channelName, channel, (key, oldValue) => channel);
         }
+
+        return channel;
+    }
+
+    public async ValueTask<IChannel> GetPublishChannelAsync(string exchange, CreateChannelOptions? options = null)
+    {
+        exchange = string.IsNullOrWhiteSpace(exchange) ? exchangeName : exchange;
+        options ??= new CreateChannelOptions(
+            publisherConfirmationsEnabled: true,
+            publisherConfirmationTrackingEnabled: true,
+            outstandingPublisherConfirmationsRateLimiter: new ThrottlingRateLimiter(1000)
+        );
+        var channel = await GetOrCreateChannelAsync(exchange, options);
+        await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
+        channel.BasicAcksAsync += OnAck;
+        channel.BasicNacksAsync += OnNack;
+        channel.BasicReturnAsync += OnBasicReturn;
+        return channel;
+    }
+
+    public async ValueTask<IChannel> GetConsumeChannelAsync(string queueName, string exchange, string routingKey, CreateChannelOptions? options = null)
+    {
+        exchange = string.IsNullOrWhiteSpace(exchange) ? exchangeName : exchange;
+        routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
+        var channel = await GetOrCreateChannelAsync(queueName, options);
+        await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
+        await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        await channel.QueueBindAsync(queueName, exchange, routingKey);
+        return channel;
+    }
+
+    public ConnectionFactory GetConnectionFactory() => _connectionFactory;
+
+    async Task OnAck(object sender, BasicAckEventArgs args) => await CleanOutstandingConfirms(args.DeliveryTag, args.Multiple);
+
+    async Task OnNack(object sender, BasicNackEventArgs args) => await CleanOutstandingConfirms(args.DeliveryTag, args.Multiple);
+
+    Task OnBasicReturn(object sender, BasicReturnEventArgs args)
+    {
+        var props = args.BasicProperties;
+        ulong sequenceNumber = 0;
+
+        if (props.Headers != null && props.Headers.TryGetValue(Constants.PublishSequenceNumberHeader, out var headerValue))
+        {
+            sequenceNumber = headerValue switch
+            {
+                byte[] bytes => BinaryPrimitives.ReadUInt64BigEndian(bytes),
+                long longValue => (ulong)longValue,
+                int intValue => (ulong)intValue,
+                _ => 0
+            };
+        }
+
+        Console.WriteLine(
+            $"{DateTime.Now} [WARNING] message has been basic.return-ed: Exchange={args.Exchange}, RoutingKey={args.RoutingKey}, ReplyText={args.ReplyText}, SequenceNumber={sequenceNumber}"
+        );
+        return Task.CompletedTask;
+    }
+
+    async Task CleanOutstandingConfirms(ulong deliveryTag, bool multiple)
+    {
+        if (debug)
+            Console.WriteLine($"{DateTime.Now} [DEBUG] confirming message: {deliveryTag} (multiple: {multiple})");
+
+        await semaphore.WaitAsync();
+        try
+        {
+            if (multiple)
+            {
+                while (outstandingConfirms.First is { } node && node.Value <= deliveryTag)
+                {
+                    outstandingConfirms.RemoveFirst();
+                    confirmedCount++;
+                }
+            }
+            else
+            {
+                outstandingConfirms.Remove(deliveryTag);
+                confirmedCount++;
+            }
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+
+        if (outstandingConfirms.Count == 0 || confirmedCount == MESSAGE_COUNT)
+        {
+            allMessagesConfirmedTcs.TrySetResult(true);
+        }
+    }
+
+    public async ValueTask<IChannel> DeclareAndBindQueue(string queueName, string exchange = exchangeName, string routingKey = "")
+    {
+        routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
+
+        var channel = await GetOrCreateChannelAsync(queueName);
+        await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
+        await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+        await channel.QueueBindAsync(queueName, exchange, routingKey);
 
         return channel;
     }
@@ -57,6 +164,4 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
 
         GC.SuppressFinalize(this);
     }
-
-    public ConnectionFactory GetConnectionFactory() => _connectionFactory;
 }
