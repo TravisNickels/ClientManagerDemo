@@ -16,9 +16,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IMessageBrokerFactory>(bf =>
+builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {
-    var connectionConfiguration = bf.GetRequiredService<IOptions<RabbitMQConnectionConfiguration>>().Value;
+    var connectionConfiguration = sp.GetRequiredService<IOptions<RabbitMQConnectionConfiguration>>().Value;
     return new MessageBrokerFactory(connectionConfiguration);
 });
 builder.Services.AddScoped<IQueuePublisher, QueuePublisher>();
