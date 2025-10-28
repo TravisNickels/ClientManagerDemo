@@ -20,8 +20,8 @@ services:
     image: rabbitmq:4-management
     container_name: client-manager-rabbitmq
     ports:
-      - "${RABBITMQ_AMQP_PORT}:${RABBITMQ_AMQP_PORT}" # AMQP
-      - "${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}" # Web UI
+      - "${RABBITMQ__AmqpPort}:${RABBITMQ__AmqpPort}" # AMQP
+      - "${RABBITMQ__ManagementPort}:${RABBITMQ__ManagementPort}" # Web UI
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -39,7 +39,7 @@ services:
       - "5000:80"
     restart: always
     environment:
-      - POSTGRES_HOST=postgres
+      - POSTGRES__Host=postgres
 
   worker:
     build:
@@ -50,4 +50,4 @@ services:
         condition: service_healthy
     restart: always
     environment:
-      - POSTGRES_HOST=postgres
+      - POSTGRES__Host=postgres
