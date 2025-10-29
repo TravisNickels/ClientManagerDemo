@@ -31,6 +31,11 @@ public class ClientService(IQueuePublisher publisher) : IClientService
         }
     }
 
+    public Task<Client> GetClientById(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
     static void ValidateClient(Client client)
     {
         if (string.IsNullOrWhiteSpace(client.FirstName))

@@ -2,6 +2,7 @@
 using ClientManager.API.Services;
 using ClientManager.Shared.DTOs.Requests;
 using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client.Exceptions;
 
 namespace ClientManager.API.Controllers;
 
@@ -22,12 +23,21 @@ public class ClientController(IClientService clientService) : ControllerBase
 
         try
         {
-            var client = await _clientService.SendCreateClientMessage(ClientMapper.ToEntity(createClientRequest), "create-client");
-            return AcceptedAtAction(nameof(CreateClient), nameof(ClientController), new { id = client.Id }, ClientMapper.ToResponse(client));
+            var client = await _clientService.SendCreateClientMessage(ClientMapper.ToEntity(createClientRequest));
+            return AcceptedAtAction(nameof(GetClient), new { id = client.Id }, ClientMapper.ToResponse(client));
         }
-        catch (Exception ex)
+        catch (PublishException ex)
         {
-            return StatusCode(500, new InvalidOperationException($"Unexpected server error occurred sending message to broker. {ex.Message}", ex));
+            return StatusCode(500, new { message = "Unexpected server error occurred sending message to broker.", details = ex.InnerException?.Message ?? ex.Message });
         }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetClient(Guid id)
+    {
+        var client = await _clientService.GetClientById(id);
+        if (client == null)
+            return NotFound();
+        return Ok(ClientMapper.ToResponse(client));
     }
 }
