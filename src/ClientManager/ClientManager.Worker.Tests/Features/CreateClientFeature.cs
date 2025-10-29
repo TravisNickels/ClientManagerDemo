@@ -1,5 +1,5 @@
-﻿using ClientManager.Shared.Models;
-using ClientManager.Worker.Data;
+﻿using ClientManager.Shared.Data;
+using ClientManager.Shared.Models;
 using ClientManager.Worker.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;

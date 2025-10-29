@@ -1,4 +1,4 @@
-﻿using ClientManager.Worker.Data;
+﻿using ClientManager.Shared.Data;
 using ClientManager.Shared.Models;
 
 namespace ClientManager.Worker.Repositories;
@@ -14,4 +14,3 @@ public class ClientRepository(AppDbContext appDbContext) : IClientRepository
         return entry.Entity;
     }
 }
-

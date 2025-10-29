@@ -1,8 +1,7 @@
 using ClientManager.Shared.Configuration;
+using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Worker;
-using ClientManager.Worker.Configuration;
-using ClientManager.Worker.Data;
 using ClientManager.Worker.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
