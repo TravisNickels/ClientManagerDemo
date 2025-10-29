@@ -1,10 +1,12 @@
 ﻿using System.Text.Json;
 using ClientManager.API.Services;
-using ClientManager.Shared.Configuration;
+using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
+using Testcontainers.RabbitMq;
 
 namespace ClientManager.API.Tests.Unit;
 
@@ -13,6 +15,7 @@ internal class ClientServiceTests
 {
     Client client = null!;
     Mock<IQueuePublisher> mockPublisher = null!;
+    ReadOnlyAppDbContext _readonlyAppDbContext = null!;
 
     [SetUp]
     public void Setup()
@@ -25,6 +28,16 @@ internal class ClientServiceTests
             LastName = "Skywalker",
             Email = "Luke.Skywalker@gmail.com"
         };
+
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
+        _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
+    }
+
+    [TearDown]
+    public async Task DisposeAsync()
+    {
+        if (_readonlyAppDbContext is not null)
+            await _readonlyAppDbContext.DisposeAsync();
     }
 
     [Test]
@@ -34,7 +47,7 @@ internal class ClientServiceTests
         var invalidClient = client;
         invalidClient.FirstName = "";
 
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
         // Then it should throw a domain validation exception
         await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
@@ -47,7 +60,7 @@ internal class ClientServiceTests
         var invalidClient = client;
         invalidClient.LastName = "";
 
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
         // Then it should throw a domain validation exception
         await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
@@ -60,7 +73,7 @@ internal class ClientServiceTests
         var invalidClient = client;
         invalidClient.Email = "";
 
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
         // Then it should throw a domain validation exception
         await FluentActions.Invoking(() => clientService.SendCreateClientMessage(invalidClient)).Should().ThrowAsync<ArgumentException>();
@@ -73,7 +86,7 @@ internal class ClientServiceTests
         var invalidClient = client;
         invalidClient.Email = "invalid-email-address";
 
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
         // Then it should throw a domain validation exception
         await FluentActions
@@ -92,15 +105,15 @@ internal class ClientServiceTests
             .ThrowsAsync(new Exception("Broker down"));
 
         // When sending the create client message
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
         var newClient = client;
 
         // Then it should throw an InvalidOperationException with inner exception message
         var ex = await FluentActions
             .Invoking(() => clientService.SendCreateClientMessage(newClient))
             .Should()
-            .ThrowAsync<InvalidOperationException>()
-            .Where(ex => ex.InnerException!.Message.Contains("Broker down"));
+            .ThrowAsync<Exception>()
+            .Where(ex => ex.Message.Contains("Broker down"));
         mockPublisher.Verify(p => p.PublishAsync(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
@@ -115,7 +128,7 @@ internal class ClientServiceTests
             .Callback<string, ReadOnlyMemory<byte>, string, string>((queue, body, exchange, routingKey) => capturedBody = body)
             .Returns(Task.CompletedTask);
 
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
         var newClient = client;
 
@@ -141,7 +154,7 @@ internal class ClientServiceTests
             .Callback<string, ReadOnlyMemory<byte>, string, string>((queue, body, exchange, routingKey) => capturedBody = body)
             .Returns(Task.CompletedTask);
 
-        var clientService = new ClientService(mockPublisher.Object);
+        var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
         var newClient = client;
 

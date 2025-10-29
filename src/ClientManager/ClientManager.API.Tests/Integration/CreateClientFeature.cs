@@ -1,10 +1,10 @@
-﻿using System.Text.Json;
-using System.Threading.Tasks;
-using ClientManager.API.Services;
+﻿using ClientManager.API.Services;
 using ClientManager.Shared.Configuration;
+using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Testcontainers.RabbitMq;
 
@@ -17,6 +17,7 @@ internal class CreateClientFeature
     MessageBrokerFactory _messageBrokerFactory = null!;
     QueuePublisher _queuePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
+    ReadOnlyAppDbContext _readonlyAppDbContext = null!;
     Client client = null!;
     string queueName = "create-client";
     string exchangeName = "client-manager";
@@ -46,6 +47,9 @@ internal class CreateClientFeature
 
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _queuePublisher = new QueuePublisher(_messageBrokerFactory);
+
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
+        _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
     }
 
     [OneTimeTearDown]
@@ -56,6 +60,9 @@ internal class CreateClientFeature
 
         if (_messageBrokerFactory is not null)
             await _messageBrokerFactory.DisposeAsync();
+
+        if (_readonlyAppDbContext is not null)
+            await _readonlyAppDbContext.DisposeAsync();
     }
 
     [SetUp]
@@ -79,7 +86,7 @@ internal class CreateClientFeature
         var newClient = client;
 
         // When sending the create client message
-        var clientService = new ClientService(_queuePublisher);
+        var clientService = new ClientService(_queuePublisher, _readonlyAppDbContext);
         var result = await clientService.SendCreateClientMessage(newClient, queueName, exchangeName, routingKey);
 
         // Then the client should be enqueued successfully
@@ -115,7 +122,7 @@ internal class CreateClientFeature
             }
         };
 
-        var clientService = new ClientService(_queuePublisher);
+        var clientService = new ClientService(_queuePublisher, _readonlyAppDbContext);
 
         foreach (var client in clients)
         {
