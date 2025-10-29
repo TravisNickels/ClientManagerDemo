@@ -1,8 +1,6 @@
-﻿using ClientManager.Shared.Configuration;
-using dotenv.net;
-using Npgsql;
+﻿using Npgsql;
 
-namespace ClientManager.Worker.Configuration;
+namespace ClientManager.Shared.Configuration;
 
 public class PostgresConnectionConfiguration()
 {
