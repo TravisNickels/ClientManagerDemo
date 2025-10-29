@@ -6,6 +6,7 @@ using ClientManager.Shared.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using RabbitMQ.Client.Exceptions;
 
 namespace ClientManager.API.Tests.Unit;
 
@@ -70,9 +71,11 @@ internal class ClientControllerTests
     public async Task CreateClient_WhenServiceFails_ShouldReturnInternalServerError()
     {
         // Given the service will throw an exception when trying to send the create client message
+        ulong publishSequenceNumber = 1;
+
         mockService
             .Setup(s => s.SendCreateClientMessage(It.IsAny<Client>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .ThrowsAsync(new InvalidOperationException("Failed", new Exception("Broker down")));
+            .ThrowsAsync(new PublishException(publishSequenceNumber, true));
 
         // When calling the controller to create a client
         var result = await controller.CreateClient(clientRequest) as ObjectResult;
@@ -81,11 +84,9 @@ internal class ClientControllerTests
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(500);
 
-        var innerException = result!.Value as InvalidOperationException;
-        innerException.Should().NotBeNull();
-        innerException!.Message.Should().Be("Unexpected server error occurred sending message to broker. Failed");
-        innerException!.InnerException!.Message.Should().Be("Failed");
-        innerException!.InnerException!.InnerException!.Message.Should().Be("Broker down");
+        var response = result.Value! as ErrorResponse;
+        response.Should().NotBeNull();
+        response.Message.Should().Be("Unexpected server error occurred sending message to broker.");
     }
 
     [Test]
