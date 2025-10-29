@@ -66,7 +66,7 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
         return channel;
     }
 
-    public async ValueTask<IChannel> GetConsumeChannelAsync(string queueName, string exchange, string routingKey, CreateChannelOptions? options = null)
+    public async ValueTask<IChannel> GetConsumeChannelAsync(string queueName, string exchange = "", string routingKey = "", CreateChannelOptions? options = null)
     {
         exchange = string.IsNullOrWhiteSpace(exchange) ? exchangeName : exchange;
         routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
