@@ -48,7 +48,7 @@ internal class CreateClientFeature
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _queuePublisher = new QueuePublisher(_messageBrokerFactory);
 
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
+        var options = new DbContextOptionsBuilder<ReadOnlyAppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
         _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
     }
 

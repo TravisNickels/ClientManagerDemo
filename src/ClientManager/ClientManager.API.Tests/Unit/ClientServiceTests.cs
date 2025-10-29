@@ -29,7 +29,7 @@ internal class ClientServiceTests
             Email = "Luke.Skywalker@gmail.com"
         };
 
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
+        var options = new DbContextOptionsBuilder<ReadOnlyAppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
         _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
     }
 
