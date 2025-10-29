@@ -1,7 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Threading;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+﻿using RabbitMQ.Client;
 
 namespace ClientManager.Shared.Messaging;
 

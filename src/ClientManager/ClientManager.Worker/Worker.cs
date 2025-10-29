@@ -1,5 +1,4 @@
 using ClientManager.Shared.Messaging;
-using ClientManager.Worker.Repositories;
 
 namespace ClientManager.Worker;
 
