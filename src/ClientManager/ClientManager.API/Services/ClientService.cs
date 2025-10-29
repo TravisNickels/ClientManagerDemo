@@ -2,6 +2,7 @@
 using System.Text.Json;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
+using RabbitMQ.Client.Exceptions;
 
 namespace ClientManager.API.Services;
 
@@ -24,9 +25,9 @@ public class ClientService(IQueuePublisher publisher) : IClientService
             await _queuePublisher.PublishAsync(queueName, body, exchange, routingKey);
             return client;
         }
-        catch (Exception ex)
+        catch (PublishException)
         {
-            throw new InvalidOperationException("Failed to enqueue client message.", ex);
+            throw;
         }
     }
 
