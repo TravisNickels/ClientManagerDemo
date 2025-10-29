@@ -30,7 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(
     {
         // Get Postgres connection configuration from DI
         var postgresConfig = sp.GetRequiredService<IOptions<PostgresConnectionConfiguration>>().Value;
-        options.UseNpgsql(postgresConfig.ToConnectionString());
+        options.UseNpgsql(postgresConfig.ToConnectionString(), b => b.MigrationsAssembly("ClientManager.Worker"));
     }
 );
 
