@@ -9,9 +9,11 @@ public class ClientService(IQueuePublisher publisher) : IClientService
 {
     readonly IQueuePublisher _queuePublisher = publisher;
 
-    public async Task<Client> SendCreateClientMessage(Client client, string queueName = "clients", string exchange = "client-manager", string routingKey = "")
+    public async Task<Client> SendCreateClientMessage(Client client, string queueName = "", string exchange = "client-manager", string routingKey = "")
     {
         ValidateClient(client);
+
+        queueName = string.IsNullOrEmpty(queueName) ? nameof(Client) : queueName;
 
         if (string.IsNullOrWhiteSpace(routingKey))
             routingKey = queueName;
