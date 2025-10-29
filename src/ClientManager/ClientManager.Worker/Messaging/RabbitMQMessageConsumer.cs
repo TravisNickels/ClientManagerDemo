@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
+using ClientManager.Shared.Messaging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace ClientManager.Shared.Messaging;
+namespace ClientManager.Worker.Messaging;
 
 public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, IMessageBrokerFactory messageBrokerFactory, ILogger<RabbitMQMessageConsumer> logger)
     : IMessageConsumer
