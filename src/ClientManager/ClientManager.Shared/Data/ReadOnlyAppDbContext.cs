@@ -4,7 +4,7 @@ namespace ClientManager.Shared.Data;
 
 public class ReadOnlyAppDbContext : AppDbContext
 {
-    public ReadOnlyAppDbContext(DbContextOptions<AppDbContext> options)
+    public ReadOnlyAppDbContext(DbContextOptions<ReadOnlyAppDbContext> options)
         : base(options) { }
 
     public override int SaveChanges() => throw new InvalidOperationException("This context is read-only.");
