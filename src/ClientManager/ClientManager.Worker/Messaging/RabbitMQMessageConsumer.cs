@@ -31,7 +31,7 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
                 return Task.CompletedTask;
             };
 
-            await channel.BasicConsumeAsync(queueName, autoAck: true, consumer);
+            await channel.BasicConsumeAsync(queueName, autoAck: false, consumer);
             _logger.LogInformation("Listening on queue: {queue}", queueName);
         }
     }
