@@ -51,8 +51,9 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        foreach (var channel in _channels.Values)
+        foreach (var (queue, channel) in _channels)
         {
+            await channel.BasicCancelAsync(queue, cancellationToken: cancellationToken);
             await channel.CloseAsync(cancellationToken);
         }
 
@@ -86,8 +87,11 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
 
         foreach (var handler in handlers)
         {
-            var method = handlerType.GetMethod("HandleAsync")!;
-            await (Task)method.Invoke(handler, [message!, cancellationToken])!;
+            if (handler is not null && message is not null)
+            {
+                dynamic dynamicHandler = handler;
+                await dynamicHandler.HandleAsync((dynamic)message, cancellationToken);
+            }
         }
     }
 }
