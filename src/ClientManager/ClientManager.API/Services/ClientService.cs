@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
 using RabbitMQ.Client.Exceptions;
 
 namespace ClientManager.API.Services;
 
-public class ClientService(IQueuePublisher publisher) : IClientService
+public class ClientService(IQueuePublisher publisher, ReadOnlyAppDbContext readOnlyAppDbContext) : IClientService
 {
     readonly IQueuePublisher _queuePublisher = publisher;
+    readonly ReadOnlyAppDbContext _readOnlyAppDbContext = readOnlyAppDbContext;
 
     public async Task<Client> SendCreateClientMessage(Client client, string queueName = "", string exchange = "client-manager", string routingKey = "")
     {
