@@ -2,6 +2,7 @@ using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Worker;
+using ClientManager.Worker.Administration;
 using ClientManager.Worker.Messaging;
 using ClientManager.Worker.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,8 @@ builder.Services.AddDbContext<AppDbContext>(
         options.UseNpgsql(postgresConfig.ToConnectionString(), b => b.MigrationsAssembly("ClientManager.Worker"));
     }
 );
+
+builder.Services.AddMessageHandlers(AppDomain.CurrentDomain.GetAssemblies());
 
 var host = builder.Build();
 host.Run();
