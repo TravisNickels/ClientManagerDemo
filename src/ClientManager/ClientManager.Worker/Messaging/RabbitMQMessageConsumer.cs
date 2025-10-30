@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
+using System.Text.Json;
 using ClientManager.Shared.Messaging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -22,13 +23,25 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         {
             var queueName = messageType.Name;
             var channel = await _messageBrokerFactory.GetConsumeChannelAsync(messageType.Name);
+            _channels.AddOrUpdate(queueName, channel, (key, oldValue) => channel);
+
             var consumer = new AsyncEventingBasicConsumer(channel);
 
-            consumer.ReceivedAsync += (_, ea) =>
+            consumer.ReceivedAsync += async (_, ea) =>
             {
                 var json = Encoding.UTF8.GetString(ea.Body.ToArray());
                 _logger.LogInformation("Received message from {queue}: {json}", queueName, json);
-                return Task.CompletedTask;
+
+                try
+                {
+                    await DispatchToHandlers(queueName, json, cancellationToken);
+                    await channel.BasicAckAsync(ea.DeliveryTag, multiple: false, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to process message from {queue}", queueName);
+                    await channel.BasicNackAsync(ea.DeliveryTag, false, requeue: true);
+                }
             };
 
             await channel.BasicConsumeAsync(queueName, autoAck: false, consumer);
