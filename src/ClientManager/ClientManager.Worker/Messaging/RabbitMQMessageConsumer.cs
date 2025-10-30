@@ -36,6 +36,16 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         }
     }
 
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        foreach (var channel in _channels.Values)
+        {
+            await channel.CloseAsync(cancellationToken);
+        }
+
+        _logger.LogInformation("All channels closed.");
+    }
+
     static IEnumerable<Type> DiscoverMessageTypes() =>
         AppDomain
             .CurrentDomain.GetAssemblies()
