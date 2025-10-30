@@ -17,7 +17,7 @@ public class ClientService(IQueuePublisher publisher, ReadOnlyAppDbContext readO
     {
         ValidateClient(message);
 
-        queueName = string.IsNullOrEmpty(queueName) ? nameof(Client) : queueName;
+        queueName = string.IsNullOrEmpty(queueName) ? nameof(CreateClient) : queueName;
 
         if (string.IsNullOrWhiteSpace(routingKey))
             routingKey = queueName;
