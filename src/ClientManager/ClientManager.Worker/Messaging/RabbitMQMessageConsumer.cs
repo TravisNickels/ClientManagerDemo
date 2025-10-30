@@ -50,6 +50,6 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         AppDomain
             .CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => typeof(IMessage).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+            .Where(type => typeof(ICommand).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
             .ToList();
 }
