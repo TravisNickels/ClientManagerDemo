@@ -1,6 +1,7 @@
 ﻿using ClientManager.API.Mappers;
 using ClientManager.API.Services;
 using ClientManager.Shared.DTOs.Requests;
+using ClientManager.Shared.DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client.Exceptions;
 
@@ -28,7 +29,12 @@ public class ClientController(IClientService clientService) : ControllerBase
         }
         catch (PublishException ex)
         {
-            return StatusCode(500, new { message = "Unexpected server error occurred sending message to broker.", details = ex.InnerException?.Message ?? ex.Message });
+            var errorResponse = new ErrorResponse
+            {
+                Message = "Unexpected server error occurred sending message to broker.",
+                Details = ex.InnerException?.Message ?? ex.Message
+            };
+            return StatusCode(500, errorResponse);
         }
     }
 
