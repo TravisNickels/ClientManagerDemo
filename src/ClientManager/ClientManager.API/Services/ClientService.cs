@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
@@ -12,20 +13,20 @@ public class ClientService(IQueuePublisher publisher, ReadOnlyAppDbContext readO
     readonly IQueuePublisher _queuePublisher = publisher;
     readonly ReadOnlyAppDbContext _readOnlyAppDbContext = readOnlyAppDbContext;
 
-    public async Task<Client> SendCreateClientMessage(Client client, string queueName = "", string exchange = "client-manager", string routingKey = "")
+    public async Task<CreateClient> SendCreateClientMessage(CreateClient message, string queueName = "", string exchange = "client-manager", string routingKey = "")
     {
-        ValidateClient(client);
+        ValidateClient(message);
 
         queueName = string.IsNullOrEmpty(queueName) ? nameof(Client) : queueName;
 
         if (string.IsNullOrWhiteSpace(routingKey))
             routingKey = queueName;
 
-        var body = JsonSerializer.SerializeToUtf8Bytes(client);
+        var body = JsonSerializer.SerializeToUtf8Bytes(message);
         try
         {
             await _queuePublisher.PublishAsync(queueName, body, exchange, routingKey);
-            return client;
+            return message;
         }
         catch (PublishException)
         {
@@ -38,20 +39,20 @@ public class ClientService(IQueuePublisher publisher, ReadOnlyAppDbContext readO
         throw new NotImplementedException();
     }
 
-    static void ValidateClient(Client client)
+    static void ValidateClient(CreateClient message)
     {
-        if (string.IsNullOrWhiteSpace(client.FirstName))
-            throw new ArgumentException("Client must have a first name.", nameof(client));
-        if (string.IsNullOrWhiteSpace(client.LastName))
-            throw new ArgumentException("Client must have a last name.", nameof(client));
-        if (string.IsNullOrWhiteSpace(client.Email))
-            throw new ArgumentException("Client must have an email.", nameof(client));
+        if (string.IsNullOrWhiteSpace(message.FirstName))
+            throw new ArgumentException("Client must have a first name.", nameof(message));
+        if (string.IsNullOrWhiteSpace(message.LastName))
+            throw new ArgumentException("Client must have a last name.", nameof(message));
+        if (string.IsNullOrWhiteSpace(message.Email))
+            throw new ArgumentException("Client must have an email.", nameof(message));
 
         var emailAttribute = new EmailAddressAttribute();
-        if (!emailAttribute.IsValid(client.Email))
-            throw new ArgumentException("Client must have a valid email address.", nameof(client));
+        if (!emailAttribute.IsValid(message.Email))
+            throw new ArgumentException("Client must have a valid email address.", nameof(message));
 
-        if (client.Id == Guid.Empty)
-            client.Id = Guid.NewGuid();
+        if (message.Id == Guid.Empty)
+            message.Id = Guid.NewGuid();
     }
 }

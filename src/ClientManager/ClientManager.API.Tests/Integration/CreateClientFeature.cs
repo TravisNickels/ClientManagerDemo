@@ -1,5 +1,6 @@
 ﻿using ClientManager.API.Services;
 using ClientManager.Shared.Configuration;
+using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
@@ -18,7 +19,7 @@ internal class CreateClientFeature
     QueuePublisher _queuePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
-    Client client = null!;
+    CreateClient clientCommand = null!;
     string queueName = "create-client";
     string exchangeName = "client-manager";
     string routingKey = "create-client";
@@ -68,7 +69,7 @@ internal class CreateClientFeature
     [SetUp]
     public async Task Setup()
     {
-        client = new Client
+        clientCommand = new CreateClient
         {
             Id = Guid.Empty,
             FirstName = "Luke",
@@ -83,7 +84,7 @@ internal class CreateClientFeature
     public async Task When_Creating_Client_The_Service_Should_Enqueue_It_For_Saving()
     {
         // Given a new valid client
-        var newClient = client;
+        var newClient = clientCommand;
 
         // When sending the create client message
         var clientService = new ClientService(_queuePublisher, _readonlyAppDbContext);
@@ -91,7 +92,7 @@ internal class CreateClientFeature
 
         // Then the client should be enqueued successfully
         result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(client);
+        result.Should().BeEquivalentTo(clientCommand);
     }
 
     [Test]
@@ -99,21 +100,21 @@ internal class CreateClientFeature
     {
         var clients = new[]
         {
-            new Client
+            new CreateClient
             {
                 Id = Guid.Empty,
                 FirstName = "Anakin",
                 LastName = "Skywalker",
                 Email = "Anakin.Skywalker@gmail.com"
             },
-            new Client
+            new CreateClient
             {
                 Id = Guid.Empty,
                 FirstName = "Leia",
                 LastName = "Organa",
                 Email = "Leia.Organa@gmail.com"
             },
-            new Client
+            new CreateClient
             {
                 Id = Guid.Empty,
                 FirstName = "Luke",

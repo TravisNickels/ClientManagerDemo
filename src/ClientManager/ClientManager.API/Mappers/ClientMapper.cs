@@ -1,4 +1,5 @@
-﻿using ClientManager.Shared.DTOs.Requests;
+﻿using ClientManager.Shared.Contracts.Commands;
+using ClientManager.Shared.DTOs.Requests;
 using ClientManager.Shared.DTOs.Responses;
 using ClientManager.Shared.Models;
 
@@ -9,6 +10,22 @@ public static class ClientMapper
     public static ClientResponse ToResponse(Client client)
     {
         return new ClientResponse(client.Id, client.FirstName!, client.LastName!, client.Email!);
+    }
+
+    public static ClientResponse ToResponse(CreateClient client)
+    {
+        return new ClientResponse(client.Id, client.FirstName!, client.LastName!, client.Email!);
+    }
+
+    public static CreateClient ToCreateClientCommand(CreateClientRequest request)
+    {
+        return new CreateClient
+        {
+            Id = request.Id ?? Guid.Empty,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+        };
     }
 
     public static Client ToEntity(CreateClientRequest request)

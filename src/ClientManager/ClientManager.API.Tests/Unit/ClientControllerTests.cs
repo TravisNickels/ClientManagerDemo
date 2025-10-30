@@ -1,5 +1,6 @@
 ﻿using ClientManager.API.Controllers;
 using ClientManager.API.Services;
+using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.DTOs.Requests;
 using ClientManager.Shared.DTOs.Responses;
 using ClientManager.Shared.Models;
@@ -17,7 +18,7 @@ internal class ClientControllerTests
     ClientController controller = null!;
     CreateClientRequest clientRequest = null!;
     ClientResponse clientResponse = null!;
-    Client client = null!;
+    CreateClient client = null!;
 
     [SetUp]
     public void Setup()
@@ -26,7 +27,7 @@ internal class ClientControllerTests
         controller = new ClientController(mockService.Object);
 
         clientRequest = new CreateClientRequest(FirstName: "Luke", LastName: "Skywalker", Email: "Luke.Skywalker@gmail.com");
-        client = new Client
+        client = new CreateClient
         {
             Id = Guid.Parse("7d33b8fc-c3b5-45bf-a0d2-d265ee873b91"),
             FirstName = clientRequest.FirstName,
@@ -40,7 +41,7 @@ internal class ClientControllerTests
     public async Task CreateClient_WhenRequestIsValid_ShouldReturnAccepted()
     {
         // When the service is called with valid client, it returns success
-        mockService.Setup(s => s.SendCreateClientMessage(It.IsAny<Client>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(client);
+        mockService.Setup(s => s.SendCreateClientMessage(It.IsAny<CreateClient>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(client);
 
         // When calling the client service with the properly mapped client from the client request
         var result = await controller.CreateClient(clientRequest) as AcceptedAtActionResult;
@@ -49,7 +50,7 @@ internal class ClientControllerTests
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(202);
         result!.Value.Should().BeEquivalentTo(clientResponse);
-        mockService.Verify(s => s.SendCreateClientMessage(It.IsAny<Client>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        mockService.Verify(s => s.SendCreateClientMessage(It.IsAny<CreateClient>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
     [Test]
@@ -74,7 +75,7 @@ internal class ClientControllerTests
         ulong publishSequenceNumber = 1;
 
         mockService
-            .Setup(s => s.SendCreateClientMessage(It.IsAny<Client>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .Setup(s => s.SendCreateClientMessage(It.IsAny<CreateClient>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new PublishException(publishSequenceNumber, true));
 
         // When calling the controller to create a client

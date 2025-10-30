@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using ClientManager.API.Services;
+using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
@@ -13,7 +14,7 @@ namespace ClientManager.API.Tests.Unit;
 [TestFixture]
 internal class ClientServiceTests
 {
-    Client client = null!;
+    CreateClient createClient = null!;
     Mock<IQueuePublisher> mockPublisher = null!;
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
 
@@ -21,7 +22,7 @@ internal class ClientServiceTests
     public void Setup()
     {
         mockPublisher = new Mock<IQueuePublisher>();
-        client = new Client
+        createClient = new CreateClient
         {
             Id = Guid.Empty,
             FirstName = "Luke",
@@ -44,7 +45,7 @@ internal class ClientServiceTests
     public async Task When_Creating_Client_With_No_First_Name_The_Service_Should_Throw()
     {
         // Given an invalid client (missing first name)
-        var invalidClient = client;
+        var invalidClient = createClient;
         invalidClient.FirstName = "";
 
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
@@ -57,7 +58,7 @@ internal class ClientServiceTests
     public async Task When_Creating_Client_With_No_Last_Name_The_Service_Should_Throw()
     {
         // Given an invalid client (missing last name)
-        var invalidClient = client;
+        var invalidClient = createClient;
         invalidClient.LastName = "";
 
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
@@ -70,7 +71,7 @@ internal class ClientServiceTests
     public async Task When_Creating_Client_With_No_Email_The_Service_Should_Throw()
     {
         // Given an invalid client (missing email)
-        var invalidClient = client;
+        var invalidClient = createClient;
         invalidClient.Email = "";
 
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
@@ -83,7 +84,7 @@ internal class ClientServiceTests
     public async Task When_Creating_Client_With_An_Invalid_Email_The_Service_Should_Throw()
     {
         // Given an invalid client (invalid email)
-        var invalidClient = client;
+        var invalidClient = createClient;
         invalidClient.Email = "invalid-email-address";
 
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
@@ -106,7 +107,7 @@ internal class ClientServiceTests
 
         // When sending the create client message
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
-        var newClient = client;
+        var newClient = createClient;
 
         // Then it should throw an InvalidOperationException with inner exception message
         var ex = await FluentActions
@@ -130,7 +131,7 @@ internal class ClientServiceTests
 
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
-        var newClient = client;
+        var newClient = createClient;
 
         // When sending the create client message
         await clientService.SendCreateClientMessage(newClient);
@@ -156,7 +157,7 @@ internal class ClientServiceTests
 
         var clientService = new ClientService(mockPublisher.Object, _readonlyAppDbContext);
 
-        var newClient = client;
+        var newClient = createClient;
 
         // When sending the create client message
         await clientService.SendCreateClientMessage(newClient);
