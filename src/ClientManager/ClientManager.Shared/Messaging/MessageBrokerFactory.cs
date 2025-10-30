@@ -53,28 +53,40 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
     public async ValueTask<IChannel> GetPublishChannelAsync(string exchange, CreateChannelOptions? options = null)
     {
         exchange = string.IsNullOrWhiteSpace(exchange) ? exchangeName : exchange;
-        options ??= new CreateChannelOptions(
-            publisherConfirmationsEnabled: true,
-            publisherConfirmationTrackingEnabled: true,
-            outstandingPublisherConfirmationsRateLimiter: new ThrottlingRateLimiter(1000)
-        );
-        var channel = await GetOrCreateChannelAsync(exchange, options);
-        await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
-        channel.BasicAcksAsync += OnAck;
-        channel.BasicNacksAsync += OnNack;
-        channel.BasicReturnAsync += OnBasicReturn;
-        return channel;
+
+        if (!_channels.TryGetValue(exchange, out IChannel? existing) || existing is null)
+        {
+            options ??= new CreateChannelOptions(
+                publisherConfirmationsEnabled: true,
+                publisherConfirmationTrackingEnabled: true,
+                outstandingPublisherConfirmationsRateLimiter: new ThrottlingRateLimiter(1000)
+            );
+            var channel = await GetOrCreateChannelAsync(exchange, options);
+            await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
+            channel.BasicAcksAsync += OnAck;
+            channel.BasicNacksAsync += OnNack;
+            channel.BasicReturnAsync += OnBasicReturn;
+            return channel;
+        }
+
+        return existing;
     }
 
     public async ValueTask<IChannel> GetConsumeChannelAsync(string queueName, string exchange = "", string routingKey = "", CreateChannelOptions? options = null)
     {
         exchange = string.IsNullOrWhiteSpace(exchange) ? exchangeName : exchange;
         routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
-        var channel = await GetOrCreateChannelAsync(queueName, options);
-        await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
-        await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        await channel.QueueBindAsync(queueName, exchange, routingKey);
-        return channel;
+
+        if (!_channels.TryGetValue(queueName, out IChannel? existing) || existing is null)
+        {
+            var channel = await GetOrCreateChannelAsync(queueName, options);
+            await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
+            await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            await channel.QueueBindAsync(queueName, exchange, routingKey);
+            return channel;
+        }
+
+        return existing;
     }
 
     public ConnectionFactory GetConnectionFactory() => _connectionFactory;
