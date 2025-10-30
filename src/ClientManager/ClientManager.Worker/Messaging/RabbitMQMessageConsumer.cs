@@ -52,4 +52,29 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(ICommand).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
             .ToList();
+
+    async Task DispatchToHandlers(string queueName, string json, CancellationToken cancellationToken)
+    {
+        await using var scope = _scopeFactory.CreateAsyncScope();
+
+        // Find message type by queue name
+        var messageType = DiscoverMessageTypes().FirstOrDefault(t => t.Name == queueName);
+        if (messageType is null)
+        {
+            _logger.LogWarning("No message type found for queue: {queue}", queueName);
+            return;
+        }
+
+        var message = JsonSerializer.Deserialize(json, messageType);
+
+        // Find handlers registered for that type
+        var handlerType = typeof(IMessageHandler<>).MakeGenericType(messageType);
+        var handlers = scope.ServiceProvider.GetServices(handlerType);
+
+        foreach (var handler in handlers)
+        {
+            var method = handlerType.GetMethod("HandleAsync")!;
+            await (Task)method.Invoke(handler, [message!, cancellationToken])!;
+        }
+    }
 }
