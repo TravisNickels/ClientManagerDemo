@@ -1,7 +1,5 @@
 ﻿using System.Text;
-using ClientManager.Shared.Contracts.Events;
 using ClientManager.Shared.Messaging;
-using ClientManager.Shared.Models;
 using Microsoft.AspNetCore.SignalR;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -30,7 +28,7 @@ public class EventForwarder(IMessageBrokerFactory messageBrokerFactory, IHubCont
         {
             var body = Encoding.UTF8.GetString(ea.Body.ToArray());
             _logger.LogInformation("Forwarding event {event}", body);
-            await _hub.Clients.All.SendAsync("eventReceived", body, cancellationToken);
+            await _hub.Clients.All.SendAsync("ClientCreated", body, cancellationToken);
             await channel.BasicAckAsync(ea.DeliveryTag, false, cancellationToken);
         };
 
