@@ -4,7 +4,6 @@ using ClientManager.Worker.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
-using Testcontainers.RabbitMq;
 
 namespace ClientManager.Worker.Tests.Features;
 
@@ -12,8 +11,6 @@ namespace ClientManager.Worker.Tests.Features;
 internal class CreateClientFeature
 {
     PostgreSqlContainer _postgresContainer = null!;
-
-    //RabbitMqContainer _rabbitMqConatiner = null!;
     AppDbContext _dbContext = null!;
     ClientRepository _clientRepository = null!;
 
