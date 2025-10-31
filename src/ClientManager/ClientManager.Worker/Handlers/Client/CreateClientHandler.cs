@@ -1,14 +1,17 @@
-﻿using ClientManager.Shared.Contracts.Commands;
+﻿using System.Text.Json;
+using ClientManager.Shared.Contracts.Commands;
+using ClientManager.Shared.Contracts.Events;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
 using ClientManager.Worker.Repositories;
 
 namespace ClientManager.Worker.Handlers;
 
-public class CreateClientHandler(IClientRepository clientRepository, ILogger<CreateClientHandler> logger) : IMessageHandler<CreateClient>
+public class CreateClientHandler(IClientRepository clientRepository, IQueuePublisher queuePublisher, ILogger<CreateClientHandler> logger) : IHandlerMessage<CreateClient>
 {
     readonly IClientRepository _clientRepository = clientRepository;
     readonly ILogger<CreateClientHandler> _logger = logger;
+    readonly IQueuePublisher _queuePublisher = queuePublisher;
 
     public async Task HandleAsync(CreateClient message, CancellationToken cancellationToken)
     {
@@ -24,5 +27,17 @@ public class CreateClientHandler(IClientRepository clientRepository, ILogger<Cre
 
         _logger.LogInformation("ClientCreatedHandler processed {client}", message.FirstName);
         //await notifier.EmitEventAsync("client.created", message);
+
+        var body = JsonSerializer.SerializeToUtf8Bytes(
+            new ClientCreated
+            {
+                ClientId = message.Id,
+                FirstName = message.FirstName,
+                LastName = message.LastName,
+                Email = message.Email
+            }
+        );
+
+        await _queuePublisher.PublishAsync(nameof(ClientCreated), body);
     }
 }
