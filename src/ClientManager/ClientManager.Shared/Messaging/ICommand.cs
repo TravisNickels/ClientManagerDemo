@@ -1,3 +1,3 @@
 ﻿namespace ClientManager.Shared.Messaging;
 
-public interface ICommand { }
+public interface ICommand : IMessage { }
