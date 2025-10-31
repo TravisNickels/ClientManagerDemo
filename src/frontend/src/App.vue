@@ -1,4 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useSignalRStore } from './stores/signalrStore'
+
+const signalR = useSignalRStore()
+
+onMounted(() => {
+  signalR.connect()
+})
+</script>
 
 <template>
   <h1>You did it!</h1>
