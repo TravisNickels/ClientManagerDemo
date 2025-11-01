@@ -9,15 +9,15 @@ public class Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFac
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        if (_logger.IsEnabled(LogLevel.Information))
-        {
-            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-        }
-
         await using var scope = _serviceScopeFactory.CreateAsyncScope();
         var consumer = scope.ServiceProvider.GetRequiredService<IMessageConsumer>();
 
         await consumer.StartAsync(cancellationToken);
+
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+        }
 
         await Task.Delay(Timeout.Infinite, cancellationToken);
     }
