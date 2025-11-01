@@ -6,7 +6,9 @@ using ClientManager.Worker.Administration;
 using ClientManager.Worker.Messaging;
 using ClientManager.Worker.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -17,6 +19,15 @@ builder.Configuration.AddEnvironmentVariables();
 // Map configuration sections to strongly typed classes
 builder.Services.Configure<PostgresConnectionConfiguration>(builder.Configuration.GetSection("POSTGRES"));
 builder.Services.Configure<RabbitMQConnectionConfiguration>(builder.Configuration.GetSection("RABBITMQ"));
+
+Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Logs"));
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration().MinimumLevel.Information().WriteTo.Console().WriteTo.File(Path.Combine(AppContext.BaseDirectory, "Logs", "worker.log")).CreateLogger();
+
+// Hook Serilog into .NET logging
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
 
 builder.Services.AddHostedService<Worker>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -38,6 +49,7 @@ builder.Services.AddDbContext<AppDbContext>(
 );
 
 builder.Services.AddMessageHandlers(AppDomain.CurrentDomain.GetAssemblies());
+builder.Logging.AddFile("/app/Logs/worker.log");
 
 var host = builder.Build();
 host.Run();
