@@ -23,6 +23,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddCors();
+builder.Services.AddHealthChecks();
 builder.Services.AddHostedService<EventForwarder>();
 builder.Services.AddScoped<IQueuePublisher, QueuePublisher>();
 builder.Services.AddScoped<IClientService, ClientService>();
@@ -51,10 +52,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.MapHub<NotificationHub>("/notifications");
+app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.UseCors(options => options.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
