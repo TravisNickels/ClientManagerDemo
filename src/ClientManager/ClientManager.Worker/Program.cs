@@ -44,6 +44,7 @@ builder.Services.AddDbContext<AppDbContext>(
     {
         // Get Postgres connection configuration from DI
         var postgresConfig = sp.GetRequiredService<IOptions<PostgresConnectionConfiguration>>().Value;
+        Console.WriteLine($"Postgres connection string: {postgresConfig.ToConnectionString()}");
         options.UseNpgsql(postgresConfig.ToConnectionString(), b => b.MigrationsAssembly("ClientManager.Worker"));
     }
 );
@@ -52,4 +53,28 @@ builder.Services.AddMessageHandlers(AppDomain.CurrentDomain.GetAssemblies());
 builder.Logging.AddFile("/app/Logs/worker.log");
 
 var host = builder.Build();
+
+using (var scope = host.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var retries = 0;
+    const int maxRetries = 10;
+
+    while (retries < maxRetries)
+    {
+        try
+        {
+            db.Database.Migrate();
+            Console.WriteLine("Database migration successful");
+            break;
+        }
+        catch (Exception ex)
+        {
+            retries++;
+            Console.WriteLine($"Database not ready (attempt {retries}/{maxRetries}): {ex.Message}");
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+        }
+    }
+}
+
 host.Run();
