@@ -1,4 +1,5 @@
-import App from '@/App.vue'
+import ClientDashboard from '@/pages/client-dashboard.vue'
+import ClientHome from '@/pages/client-home.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -6,8 +7,13 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: App,
+      name: 'client-home',
+      component: ClientHome,
+    },
+    {
+      path: '/client-dashboard',
+      name: 'client-dashboard',
+      component: ClientDashboard,
     },
   ],
 })
