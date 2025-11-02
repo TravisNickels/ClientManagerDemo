@@ -17,7 +17,6 @@ builder.Services.Configure<RabbitMQConnectionConfiguration>(builder.Configuratio
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -47,8 +46,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI();
+    //  Go to http://localhost:5200/swagger/index.html to test the API
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClientManager API v1");
+    });
 }
 
 app.UseAuthorization();
