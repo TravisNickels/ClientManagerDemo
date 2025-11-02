@@ -18,9 +18,9 @@ export const useSignalRStore = defineStore('signalr', {
         .configureLogging(signalR.LogLevel.Information)
         .build()
 
-      this.connection.on('clientcreated', (clientData) => {
+      this.connection.on('clientresponse', (clientData) => {
         console.log('Client created event received:', clientData)
-        this.clientCreated(clientData)
+        this.clientResponse(clientData)
       })
 
       this.connection.onreconnected(() => {
@@ -37,7 +37,7 @@ export const useSignalRStore = defineStore('signalr', {
       }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    clientCreated(clientData: any) {
+    clientResponse(clientData: any) {
       this.messages.push(`Client created: ${JSON.stringify(clientData)}`)
     },
     async disconnect() {
