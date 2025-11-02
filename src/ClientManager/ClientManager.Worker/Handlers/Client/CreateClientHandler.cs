@@ -26,7 +26,6 @@ public class CreateClientHandler(IClientRepository clientRepository, IQueuePubli
         );
 
         _logger.LogInformation("ClientCreatedHandler processed {client}", message.FirstName);
-        //await notifier.EmitEventAsync("client.created", message);
 
         var body = JsonSerializer.SerializeToUtf8Bytes(
             new ClientCreated
