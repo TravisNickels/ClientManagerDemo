@@ -16,11 +16,6 @@ WORKDIR /src
 COPY ["./ClientManager.API/ClientManager.API.csproj", "ClientManager.API/"]
 COPY ["./ClientManager.Shared/ClientManager.Shared.csproj", "ClientManager.Shared/"]
 RUN dotnet restore "./ClientManager.API/ClientManager.API.csproj"
-# COPY ./ClientManager.API ./ClientManager.API
-# COPY ./ClientManager.Shared ./ClientManager.Shared
-
-# Copy full source
-#COPY . .
 
 WORKDIR /src/ClientManager.API
 
