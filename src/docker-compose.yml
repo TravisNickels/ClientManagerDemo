@@ -95,8 +95,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: client-manager-frontend
+    volumes:
+      - "./frontend:/app"
+      - "/app/node_modules"
     ports:
       - "5173:5173"
+    environment:
+      CHOKIDAR_USEPOLLING: true
     depends_on:
       api:
         condition: service_healthy
