@@ -6,7 +6,6 @@ using ClientManager.Worker.Administration;
 using ClientManager.Worker.Messaging;
 using ClientManager.Worker.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -44,13 +43,11 @@ builder.Services.AddDbContext<AppDbContext>(
     {
         // Get Postgres connection configuration from DI
         var postgresConfig = sp.GetRequiredService<IOptions<PostgresConnectionConfiguration>>().Value;
-        Console.WriteLine($"Postgres connection string: {postgresConfig.ToConnectionString()}");
         options.UseNpgsql(postgresConfig.ToConnectionString(), b => b.MigrationsAssembly("ClientManager.Worker"));
     }
 );
 
 builder.Services.AddMessageHandlers(AppDomain.CurrentDomain.GetAssemblies());
-builder.Logging.AddFile("/app/Logs/worker.log");
 
 var host = builder.Build();
 
