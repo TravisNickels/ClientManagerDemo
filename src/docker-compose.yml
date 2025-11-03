@@ -34,7 +34,11 @@ services:
   api:
     build:
       context: ./ClientManager
-      dockerfile: ClientManager.API/Dockerfile
+      dockerfile: ClientManager.API/Dockerfile.dev
+    container_name: client-manager-api
+    volumes:
+      - ./ClientManager/ClientManager.API:/src/ClientManager.API
+      - ./ClientManager/ClientManager.Shared:/src/ClientManager.Shared
     depends_on:
       postgres:
         condition: service_healthy

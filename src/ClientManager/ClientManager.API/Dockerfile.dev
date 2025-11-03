@@ -1,0 +1,33 @@
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+# Install curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+USER $APP_UID
+WORKDIR /app
+EXPOSE 5200
+
+# This stage is used to build the service project
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+#ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["./ClientManager.API/ClientManager.API.csproj", "ClientManager.API/"]
+COPY ["./ClientManager.Shared/ClientManager.Shared.csproj", "ClientManager.Shared/"]
+RUN dotnet restore "./ClientManager.API/ClientManager.API.csproj"
+# COPY ./ClientManager.API ./ClientManager.API
+# COPY ./ClientManager.Shared ./ClientManager.Shared
+
+# Copy full source
+#COPY . .
+
+WORKDIR /src/ClientManager.API
+
+# Use polling to ensure file change detection works on Docker for Windows/macOS
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+
+# Disable the hot reload prompt (cleaner logs)
+ENV DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER=true
+
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5200"]
