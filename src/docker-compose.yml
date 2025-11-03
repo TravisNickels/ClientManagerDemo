@@ -39,6 +39,11 @@ services:
     volumes:
       - ./ClientManager/ClientManager.API:/src/ClientManager.API
       - ./ClientManager/ClientManager.Shared:/src/ClientManager.Shared
+      - /src/ClientManager.API/bin
+      - /src/ClientManager.API/obj
+      - /src/ClientManager.Shared/bin
+      - /src/ClientManager.Shared/obj
+      - ~/.nuget/packages:/root/.nuget/packages:ro
     ports:
       - "5200:5200"
     restart: always
@@ -71,6 +76,11 @@ services:
     volumes:
       - ./ClientManager/ClientManager.Worker:/src/ClientManager.Worker
       - ./ClientManager/ClientManager.Shared:/src/ClientManager.Shared
+      - /src/ClientManager.Worker/bin
+      - /src/ClientManager.Worker/obj
+      - /src/ClientManager.Shared/bin
+      - /src/ClientManager.Shared/obj
+      - ~/.nuget/packages:/root/.nuget/packages:ro
     restart: always
     env_file:
       - ".env"
