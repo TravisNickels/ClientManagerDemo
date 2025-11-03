@@ -47,7 +47,7 @@ services:
       worker:
         condition: service_healthy
     ports:
-      - "5200:8080"
+      - "5200:5200"
     restart: always
     env_file:
       - ".env"
@@ -57,7 +57,7 @@ services:
       DOTNET_URLS: "http://+:8080"
       ASPNETCORE_URLS: "http://+:8080"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5200/health || exit 1"]
       interval: 5s
       timeout: 2s
       retries: 10
