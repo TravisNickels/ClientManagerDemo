@@ -84,7 +84,7 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         var message = JsonSerializer.Deserialize(json, messageType);
 
         // Find handlers registered for that type
-        var handlerType = typeof(IHandlerMessage<>).MakeGenericType(messageType);
+        var handlerType = typeof(IHandleMessage<>).MakeGenericType(messageType);
         var handlers = scope.ServiceProvider.GetServices(handlerType);
 
         foreach (var handler in handlers)

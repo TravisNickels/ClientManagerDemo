@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
 {
     public static void AddMessageHandlers(this IServiceCollection services, params Assembly[] assemblies)
     {
-        var handlerInterface = typeof(IHandlerMessage<>);
+        var handlerInterface = typeof(IHandleMessage<>);
 
         var registrations =
             from type in assemblies.SelectMany(a => a.GetTypes())

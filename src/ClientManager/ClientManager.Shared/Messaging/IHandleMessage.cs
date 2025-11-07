@@ -1,6 +1,6 @@
 ﻿namespace ClientManager.Shared.Messaging;
 
-public interface IHandlerMessage<T>
+public interface IHandleMessage<T>
     where T : IMessage
 {
     Task HandleAsync(T message, CancellationToken cancellationToken);

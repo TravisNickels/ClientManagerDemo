@@ -7,7 +7,7 @@ using ClientManager.Worker.Repositories;
 
 namespace ClientManager.Worker.Handlers;
 
-public class CreateClientHandler(IClientRepository clientRepository, IQueuePublisher queuePublisher, ILogger<CreateClientHandler> logger) : IHandlerMessage<CreateClient>
+public class CreateClientHandler(IClientRepository clientRepository, IQueuePublisher queuePublisher, ILogger<CreateClientHandler> logger) : IHandleMessage<CreateClient>
 {
     readonly IClientRepository _clientRepository = clientRepository;
     readonly ILogger<CreateClientHandler> _logger = logger;
