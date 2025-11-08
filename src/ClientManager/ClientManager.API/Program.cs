@@ -24,7 +24,7 @@ builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.AddHealthChecks();
 builder.Services.AddHostedService<EventForwarder>();
-builder.Services.AddScoped<IQueuePublisher, QueuePublisher>();
+builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {

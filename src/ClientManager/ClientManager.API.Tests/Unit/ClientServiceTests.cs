@@ -15,13 +15,13 @@ namespace ClientManager.API.Tests.Unit;
 internal class ClientServiceTests
 {
     CreateClient createClient = null!;
-    Mock<IQueuePublisher> mockPublisher = null!;
+    Mock<IMessagePublisher> mockPublisher = null!;
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
 
     [SetUp]
     public void Setup()
     {
-        mockPublisher = new Mock<IQueuePublisher>();
+        mockPublisher = new Mock<IMessagePublisher>();
         createClient = new CreateClient
         {
             Id = Guid.Empty,

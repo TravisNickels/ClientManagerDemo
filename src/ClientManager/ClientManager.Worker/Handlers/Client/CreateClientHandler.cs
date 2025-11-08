@@ -7,11 +7,11 @@ using ClientManager.Worker.Repositories;
 
 namespace ClientManager.Worker.Handlers;
 
-public class CreateClientHandler(IClientRepository clientRepository, IQueuePublisher queuePublisher, ILogger<CreateClientHandler> logger) : IHandleMessage<CreateClient>
+public class CreateClientHandler(IClientRepository clientRepository, IMessagePublisher queuePublisher, ILogger<CreateClientHandler> logger) : IHandleMessage<CreateClient>
 {
     readonly IClientRepository _clientRepository = clientRepository;
     readonly ILogger<CreateClientHandler> _logger = logger;
-    readonly IQueuePublisher _queuePublisher = queuePublisher;
+    readonly IMessagePublisher _queuePublisher = queuePublisher;
 
     public async Task HandleAsync(CreateClient message, CancellationToken cancellationToken)
     {

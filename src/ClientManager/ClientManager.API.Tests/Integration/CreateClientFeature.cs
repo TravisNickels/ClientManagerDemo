@@ -16,7 +16,7 @@ internal class CreateClientFeature
 {
     RabbitMqContainer _rabbitMqConatiner = null!;
     MessageBrokerFactory _messageBrokerFactory = null!;
-    QueuePublisher _queuePublisher = null!;
+    MessagePublisher _queuePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
     CreateClient clientCommand = null!;
@@ -47,7 +47,7 @@ internal class CreateClientFeature
         };
 
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
-        _queuePublisher = new QueuePublisher(_messageBrokerFactory);
+        _queuePublisher = new MessagePublisher(_messageBrokerFactory);
 
         var options = new DbContextOptionsBuilder<ReadOnlyAppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
         _readonlyAppDbContext = new ReadOnlyAppDbContext(options);

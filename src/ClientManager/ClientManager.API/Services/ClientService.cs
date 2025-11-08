@@ -8,9 +8,9 @@ using RabbitMQ.Client.Exceptions;
 
 namespace ClientManager.API.Services;
 
-public class ClientService(IQueuePublisher publisher, ReadOnlyAppDbContext readOnlyAppDbContext) : IClientService
+public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext readOnlyAppDbContext) : IClientService
 {
-    readonly IQueuePublisher _queuePublisher = publisher;
+    readonly IMessagePublisher _queuePublisher = publisher;
     readonly ReadOnlyAppDbContext _readOnlyAppDbContext = readOnlyAppDbContext;
 
     public async Task<CreateClient> SendCreateClientMessage(CreateClient message, string queueName = "", string exchange = "client-manager", string routingKey = "")

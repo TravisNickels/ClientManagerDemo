@@ -2,7 +2,7 @@
 
 namespace ClientManager.Shared.Messaging;
 
-public class QueuePublisher(IMessageBrokerFactory messageBrokerFactory) : IQueuePublisher
+public class MessagePublisher(IMessageBrokerFactory messageBrokerFactory) : IMessagePublisher
 {
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
     readonly LinkedList<ulong> outstandingConfirms = new();
