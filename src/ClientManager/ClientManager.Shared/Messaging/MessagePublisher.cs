@@ -5,6 +5,8 @@ namespace ClientManager.Shared.Messaging;
 public class MessagePublisher(IMessageBrokerFactory messageBrokerFactory) : IMessagePublisher
 {
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
+    readonly IRoutingConvention _routingConvention = routingConvention;
+    readonly IMessageContextAccessor _messageContextAccessor = messageContextAccessor;
     readonly LinkedList<ulong> outstandingConfirms = new();
 
     public async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default)
@@ -12,6 +14,7 @@ public class MessagePublisher(IMessageBrokerFactory messageBrokerFactory) : IMes
     {
         exchange = string.IsNullOrWhiteSpace(exchange) ? "client-manager" : exchange;
         routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
+        var (exchange, routingKey) = _routingConvention.ResolveFor(typeof(T));
         var channel = await _messageBrokerFactory.GetPublishChannelAsync(exchange);
 
         var props = new BasicProperties();
