@@ -22,7 +22,12 @@ builder.Services.Configure<RabbitMQConnectionConfiguration>(builder.Configuratio
 Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Logs"));
 
 // Configure Serilog
-Log.Logger = new LoggerConfiguration().MinimumLevel.Information().WriteTo.Console().WriteTo.File(Path.Combine(AppContext.BaseDirectory, "Logs", "worker.log")).CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .Enrich.WithProperty("Service", "Worker")
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Service}] {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File(Path.Combine(AppContext.BaseDirectory, "Logs", "worker.log"))
+    .CreateLogger();
 
 // Hook Serilog into .NET logging
 builder.Logging.ClearProviders();

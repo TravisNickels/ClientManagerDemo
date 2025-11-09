@@ -4,6 +4,7 @@ using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,14 @@ builder.Services.AddDbContext<AppDbContext, ReadOnlyAppDbContext>(
         var postgresConfig = sp.GetRequiredService<IOptions<PostgresConnectionConfiguration>>().Value;
         options.UseNpgsql(postgresConfig.ToConnectionString());
     }
+);
+builder.Host.UseSerilog(
+    (context, loggerConfig) =>
+        loggerConfig
+            .ReadFrom.Configuration(context.Configuration)
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("Service", "API")
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{Service}] {Message:lj}{NewLine}{Exception}")
 );
 
 var app = builder.Build();
