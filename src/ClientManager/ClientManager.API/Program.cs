@@ -29,6 +29,7 @@ builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
 builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddSingleton<MessagePublisherPipeline>();
 builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {
     // Get RabbitMQ connection configuration from DI

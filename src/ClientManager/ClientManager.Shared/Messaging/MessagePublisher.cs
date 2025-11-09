@@ -1,19 +1,29 @@
 ﻿using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
-using Serilog.Context;
 
 namespace ClientManager.Shared.Messaging;
 
-public class MessagePublisher(IMessageBrokerFactory messageBrokerFactory, IRoutingConvention routingConvention, IMessageContextAccessor messageContextAccessor)
-    : IMessagePublisher
+public class MessagePublisher(
+    IMessageBrokerFactory messageBrokerFactory,
+    IRoutingConvention routingConvention,
+    IMessageContextAccessor messageContextAccessor,
+    MessagePublisherPipeline messagePublishPipeline
+) : IMessagePublisher
 {
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
     readonly IRoutingConvention _routingConvention = routingConvention;
     readonly IMessageContextAccessor _messageContextAccessor = messageContextAccessor;
     readonly LinkedList<ulong> outstandingConfirms = new();
+    readonly MessagePublisherPipeline _messagePublishPipeline = messagePublishPipeline;
 
     public async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default)
+        where T : IMessage
+    {
+        await _messagePublishPipeline.ExecuteAsync(message, FinalPublishAsync, cancellationToken);
+    }
+
+    public async Task FinalPublishAsync<T>(T message, CancellationToken cancellationToken = default)
         where T : IMessage
     {
         var (exchange, routingKey) = _routingConvention.ResolveFor(typeof(T));

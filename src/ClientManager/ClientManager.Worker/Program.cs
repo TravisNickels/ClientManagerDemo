@@ -38,6 +38,7 @@ builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
 builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
+builder.Services.AddSingleton<MessagePublisherPipeline>();
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQMessageConsumer>();
 builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {
