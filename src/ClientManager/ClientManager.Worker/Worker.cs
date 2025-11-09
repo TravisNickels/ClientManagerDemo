@@ -2,23 +2,16 @@ using ClientManager.Shared.Messaging;
 
 namespace ClientManager.Worker;
 
-public class Worker(ILogger<Worker> logger, IServiceScopeFactory serviceScopeFactory) : BackgroundService
+public class Worker(ILogger<Worker> logger, IMessageConsumer messageConsumer) : BackgroundService
 {
     readonly ILogger<Worker> _logger = logger;
-    readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    readonly IMessageConsumer _messageConsumer = messageConsumer;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await using var scope = _serviceScopeFactory.CreateAsyncScope();
-        var consumer = scope.ServiceProvider.GetRequiredService<IMessageConsumer>();
+        await _messageConsumer.StartAsync(cancellationToken);
 
-        await consumer.StartAsync(cancellationToken);
-
-        if (_logger.IsEnabled(LogLevel.Information))
-        {
-            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-        }
-
+        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
         await Task.Delay(Timeout.Infinite, cancellationToken);
     }
 }
