@@ -13,7 +13,7 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
     readonly ILogger<CreateClientHandler> _logger = logger;
     readonly IMessagePublisher _messagePublisher = messagePublisher;
 
-    public async Task HandleAsync(CreateClient message, CancellationToken cancellationToken)
+    public async Task HandleAsync(CreateClient message, MessageContext context, CancellationToken cancellationToken)
     {
         await _clientRepository.AddAsync(
             new Client

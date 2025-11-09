@@ -3,5 +3,5 @@
 public interface IHandleMessage<T>
     where T : IMessage
 {
-    Task HandleAsync(T message, CancellationToken cancellationToken);
+    Task HandleAsync(T message, MessageContext context, CancellationToken cancellationToken);
 }
