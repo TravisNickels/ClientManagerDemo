@@ -3,10 +3,8 @@ using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
-using ClientManager.Shared.Models;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Testcontainers.RabbitMq;
 
 namespace ClientManager.API.Tests.Integration;
@@ -19,10 +17,9 @@ internal class CreateClientFeature
     MessagePublisher _messagePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
+    RoutingConvention _routingConvention = null!;
+    MessageContextAccessor _messageContextAccessor = null!;
     CreateClient clientCommand = null!;
-    string queueName = "create-client";
-    string exchangeName = "client-manager";
-    string routingKey = "create-client";
 
     [OneTimeSetUp]
     public async Task CreateRabbitMqContainer()
@@ -47,7 +44,9 @@ internal class CreateClientFeature
         };
 
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
-        _queuePublisher = new MessagePublisher(_messageBrokerFactory);
+        _routingConvention = new RoutingConvention();
+        _messageContextAccessor = new MessageContextAccessor();
+        _messagePublisher = new MessagePublisher(_messageBrokerFactory, _routingConvention, _messageContextAccessor);
 
         var options = new DbContextOptionsBuilder<ReadOnlyAppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
         _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
@@ -77,7 +76,7 @@ internal class CreateClientFeature
             Email = "Luke.Skywalker@gmail.com"
         };
 
-        await _messageBrokerFactory.DeclareAndBindQueue(queueName: queueName, exchange: exchangeName, routingKey: routingKey);
+        await _messageBrokerFactory.DeclareAndBindQueue(nameof(CreateClient));
     }
 
     [Test]
