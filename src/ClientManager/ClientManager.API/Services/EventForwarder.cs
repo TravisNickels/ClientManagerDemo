@@ -32,10 +32,16 @@ public class EventForwarder(IMessageBrokerFactory messageBrokerFactory, IHubCont
         {
             var body = Encoding.UTF8.GetString(ea.Body.ToArray());
             var eventType = _eventTypesCache[queueName];
-            var deserialized = JsonSerializer.Deserialize(body, eventType);
+
+            var envelope = JsonSerializer.Deserialize<MessageEnvelope<object>>(body);
+            ArgumentNullException.ThrowIfNull(envelope);
+
+            var jsonElement = (JsonElement)envelope.Message;
+            var messageEvent = jsonElement.Deserialize(eventType);
+
             var eventInterface = _interfaceCache[queueName];
-            var responseDto = eventInterface.GetMethod("ToResponse")!.Invoke(deserialized, null);
-            _logger.LogInformation("Forwarding event {event}", responseDto);
+            var responseDto = eventInterface.GetMethod("ToResponse")!.Invoke(messageEvent, null);
+            _logger.LogInformation("Forwarding event {event} [correlationId: {correlationId}]", responseDto, envelope.CorrelationId);
             await _hub.Clients.All.SendAsync(responseDto!.GetType().Name, responseDto, cancellationToken);
             await channel.BasicAckAsync(ea.DeliveryTag, false, cancellationToken);
         };

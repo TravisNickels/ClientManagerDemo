@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using ClientManager.Shared.Messaging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -35,7 +34,6 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         consumer.ReceivedAsync += async (_, ea) =>
         {
             var json = Encoding.UTF8.GetString(ea.Body.ToArray());
-            _logger.LogInformation("Received message from {queue}: {json}", queueName, json);
 
             try
             {
@@ -83,10 +81,18 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
             return;
         }
 
-        var message = JsonSerializer.Deserialize(json, messageType);
+        var envelope = JsonSerializer.Deserialize<MessageEnvelope<object>>(json);
+        ArgumentNullException.ThrowIfNull(envelope);
 
-        // Find handlers registered for that type
+        var jsonElement = (JsonElement)envelope.Message;
+        var message = jsonElement.Deserialize(messageType);
+
+        var messageContext = GetMessageContext(envelope);
         messageContextAccessor.Current = messageContext;
+
+        _logger.LogInformation("Received message from {queue}: \n\t[correlationId: {correlationId}]\n\t{@Message}", queueName, messageContext.CorrelationId, message);
+
+        // Find handler registered for that message type
         var handlerType = typeof(IHandleMessage<>).MakeGenericType(messageType);
         var handlers = scope.ServiceProvider.GetServices(handlerType);
 
@@ -95,8 +101,11 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
             if (handler is not null && message is not null)
             {
                 dynamic dynamicHandler = handler;
-                await dynamicHandler.HandleAsync((dynamic)message, cancellationToken);
+                await dynamicHandler.HandleAsync((dynamic)message, messageContext, cancellationToken);
             }
         }
     }
+
+    static MessageContext GetMessageContext(MessageEnvelope<object> envelope) =>
+        new MessageContext(CorrelationId: envelope.CorrelationId, CausationId: envelope.CausationId, Timestamp: envelope.CreatedUtc);
 }
