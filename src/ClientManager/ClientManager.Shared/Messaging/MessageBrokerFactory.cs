@@ -16,7 +16,6 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
     readonly TaskCompletionSource<bool> allMessagesConfirmedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
     const int MESSAGE_COUNT = 10000;
     int confirmedCount = 0;
-    const bool debug = true;
 
     readonly ConnectionFactory _connectionFactory =
         new()
@@ -119,9 +118,6 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
 
     async Task CleanOutstandingConfirms(ulong deliveryTag, bool multiple)
     {
-        if (debug)
-            Console.WriteLine($"{DateTime.Now} [DEBUG] confirming message: {deliveryTag} (multiple: {multiple})");
-
         await semaphore.WaitAsync();
         try
         {
@@ -150,16 +146,21 @@ public class MessageBrokerFactory(RabbitMQConnectionConfiguration rabbitMQConnec
         }
     }
 
-    public async ValueTask<IChannel> DeclareAndBindQueue(string queueName, string exchange = exchangeName, string routingKey = "")
+    public async ValueTask<IChannel> DeclareAndBindQueue(string queueName, string exchange = exchangeName, string routingKey = "", CreateChannelOptions? options = null)
     {
+        exchange = string.IsNullOrWhiteSpace(exchange) ? exchangeName : exchange;
         routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;
 
-        var channel = await GetOrCreateChannelAsync(queueName);
-        await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
-        await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-        await channel.QueueBindAsync(queueName, exchange, routingKey);
+        if (!_channels.TryGetValue(queueName, out IChannel? existing) || existing is null)
+        {
+            var channel = await GetOrCreateChannelAsync(queueName, options);
+            await channel.ExchangeDeclareAsync(exchange, "direct", durable: true, autoDelete: false, arguments: null);
+            await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            await channel.QueueBindAsync(queueName, exchange, routingKey);
+            return channel;
+        }
 
-        return channel;
+        return existing;
     }
 
     public async ValueTask DisposeAsync()
