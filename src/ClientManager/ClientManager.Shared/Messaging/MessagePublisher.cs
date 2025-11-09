@@ -7,7 +7,8 @@ public class MessagePublisher(IMessageBrokerFactory messageBrokerFactory) : IMes
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
     readonly LinkedList<ulong> outstandingConfirms = new();
 
-    public async Task PublishAsync(string queueName, ReadOnlyMemory<byte> body, string exchange = "", string routingKey = "")
+    public async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default)
+        where T : IMessage
     {
         exchange = string.IsNullOrWhiteSpace(exchange) ? "client-manager" : exchange;
         routingKey = string.IsNullOrWhiteSpace(routingKey) ? queueName : routingKey;

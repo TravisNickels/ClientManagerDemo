@@ -16,7 +16,7 @@ internal class CreateClientFeature
 {
     RabbitMqContainer _rabbitMqConatiner = null!;
     MessageBrokerFactory _messageBrokerFactory = null!;
-    MessagePublisher _queuePublisher = null!;
+    MessagePublisher _messagePublisher = null!;
     RabbitMQConnectionConfiguration _rabbitMqConnectionConfiguration = null!;
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
     CreateClient clientCommand = null!;
@@ -87,8 +87,8 @@ internal class CreateClientFeature
         var newClient = clientCommand;
 
         // When sending the create client message
-        var clientService = new ClientService(_queuePublisher, _readonlyAppDbContext);
-        var result = await clientService.SendCreateClientMessage(newClient, queueName, exchangeName, routingKey);
+        var clientService = new ClientService(_messagePublisher, _readonlyAppDbContext);
+        var result = await clientService.SendCreateClientMessage(newClient);
 
         // Then the client should be enqueued successfully
         result.Should().NotBeNull();
@@ -123,11 +123,11 @@ internal class CreateClientFeature
             }
         };
 
-        var clientService = new ClientService(_queuePublisher, _readonlyAppDbContext);
+        var clientService = new ClientService(_messagePublisher, _readonlyAppDbContext);
 
         foreach (var client in clients)
         {
-            var result = await clientService.SendCreateClientMessage(client, queueName, exchangeName, routingKey);
+            var result = await clientService.SendCreateClientMessage(client);
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(client);
         }

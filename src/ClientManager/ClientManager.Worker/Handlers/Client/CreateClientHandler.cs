@@ -27,16 +27,14 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
 
         _logger.LogInformation("ClientCreatedHandler processed {client}", message.FirstName);
 
-        var body = JsonSerializer.SerializeToUtf8Bytes(
-            new ClientCreated
-            {
-                ClientId = message.Id,
-                FirstName = message.FirstName,
-                LastName = message.LastName,
-                Email = message.Email
-            }
-        );
+        var createdEvent = new ClientCreated
+        {
+            ClientId = message.Id,
+            FirstName = message.FirstName,
+            LastName = message.LastName,
+            Email = message.Email
+        };
 
-        await _queuePublisher.PublishAsync(nameof(ClientCreated), body);
+        await _messagePublisher.PublishAsync(createdEvent);
     }
 }
