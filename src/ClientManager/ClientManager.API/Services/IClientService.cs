@@ -5,6 +5,6 @@ namespace ClientManager.API.Services;
 
 public interface IClientService
 {
-    Task<CreateClient> SendCreateClientMessage(CreateClient message, string queueName = "", string exchange = "", string routingKey = "");
+    Task<CreateClient> SendCreateClientMessage(CreateClient message);
     Task<Client> GetClientById(Guid id);
 }

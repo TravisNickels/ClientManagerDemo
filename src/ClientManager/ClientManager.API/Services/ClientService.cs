@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
@@ -10,22 +9,17 @@ namespace ClientManager.API.Services;
 
 public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext readOnlyAppDbContext) : IClientService
 {
-    readonly IMessagePublisher _queuePublisher = publisher;
+    readonly IMessagePublisher _messagePublisher = publisher;
+
     readonly ReadOnlyAppDbContext _readOnlyAppDbContext = readOnlyAppDbContext;
 
-    public async Task<CreateClient> SendCreateClientMessage(CreateClient message, string queueName = "", string exchange = "client-manager", string routingKey = "")
+    public async Task<CreateClient> SendCreateClientMessage(CreateClient message)
     {
         ValidateClient(message);
 
-        queueName = string.IsNullOrEmpty(queueName) ? nameof(CreateClient) : queueName;
-
-        if (string.IsNullOrWhiteSpace(routingKey))
-            routingKey = queueName;
-
-        var body = JsonSerializer.SerializeToUtf8Bytes(message);
         try
         {
-            await _queuePublisher.PublishAsync(queueName, body, exchange, routingKey);
+            await _messagePublisher.PublishAsync(message);
             return message;
         }
         catch (PublishException)
