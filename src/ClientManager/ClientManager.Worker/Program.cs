@@ -29,6 +29,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog();
 
 builder.Services.AddHostedService<Worker>();
+builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
 builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();

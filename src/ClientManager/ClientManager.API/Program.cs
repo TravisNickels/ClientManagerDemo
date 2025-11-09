@@ -24,6 +24,7 @@ builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.AddHealthChecks();
 builder.Services.AddHostedService<EventForwarder>();
+builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
 builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientService, ClientService>();

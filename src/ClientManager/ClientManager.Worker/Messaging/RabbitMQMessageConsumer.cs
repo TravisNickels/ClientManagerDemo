@@ -73,7 +73,9 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
 
     async Task DispatchToHandlers(string queueName, string json, CancellationToken cancellationToken)
     {
+        // Need to create a scope inside the singleton for every message
         await using var scope = _scopeFactory.CreateAsyncScope();
+        var messageContextAccessor = scope.ServiceProvider.GetRequiredService<IMessageContextAccessor>();
 
         if (!_messageTypeCache.TryGetValue(queueName, out var messageType))
         {
@@ -84,6 +86,7 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         var message = JsonSerializer.Deserialize(json, messageType);
 
         // Find handlers registered for that type
+        messageContextAccessor.Current = messageContext;
         var handlerType = typeof(IHandleMessage<>).MakeGenericType(messageType);
         var handlers = scope.ServiceProvider.GetServices(handlerType);
 
