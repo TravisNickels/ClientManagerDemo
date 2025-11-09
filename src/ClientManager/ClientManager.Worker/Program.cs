@@ -30,8 +30,8 @@ builder.Logging.AddSerilog();
 
 builder.Services.AddHostedService<Worker>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
-builder.Services.AddScoped<IMessageConsumer, RabbitMQMessageConsumer>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
+builder.Services.AddSingleton<IMessageConsumer, RabbitMQMessageConsumer>();
 builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {
     // Get RabbitMQ connection configuration from DI
