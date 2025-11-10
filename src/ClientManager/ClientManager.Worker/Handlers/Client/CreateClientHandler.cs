@@ -29,7 +29,7 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
 
         var createdEvent = new ClientCreated
         {
-            ClientId = message.Id,
+            Id = message.Id,
             FirstName = message.FirstName,
             LastName = message.LastName,
             Email = message.Email
