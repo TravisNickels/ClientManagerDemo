@@ -5,6 +5,7 @@ using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Testcontainers.RabbitMq;
 
 namespace ClientManager.API.Tests.Integration;
@@ -19,6 +20,7 @@ internal class CreateClientFeature
     ReadOnlyAppDbContext _readonlyAppDbContext = null!;
     RoutingConvention _routingConvention = null!;
     MessageContextAccessor _messageContextAccessor = null!;
+    MessagePublishPipeline _messagePublisherPipeline = null!;
     CreateClient clientCommand = null!;
 
     [OneTimeSetUp]
@@ -43,10 +45,20 @@ internal class CreateClientFeature
             Password = "guest"
         };
 
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole().SetMinimumLevel(LogLevel.Debug);
+        });
+        var logger = loggerFactory.CreateLogger<MessageValidationMiddleware>();
+
+        var publishMessageList = new List<IMessagePublishMiddleware>();
+
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _routingConvention = new RoutingConvention();
         _messageContextAccessor = new MessageContextAccessor();
-        _messagePublisher = new MessagePublisher(_messageBrokerFactory, _routingConvention, _messageContextAccessor);
+        _messagePublisherPipeline = new MessagePublishPipeline();
+        _messagePublisherPipeline.Use(new MessageValidationMiddleware(logger));
+        _messagePublisher = new MessagePublisher(_messageBrokerFactory, _routingConvention, _messageContextAccessor, _messagePublisherPipeline);
 
         var options = new DbContextOptionsBuilder<ReadOnlyAppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
         _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
