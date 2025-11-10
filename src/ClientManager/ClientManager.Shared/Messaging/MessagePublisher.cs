@@ -8,22 +8,22 @@ public class MessagePublisher(
     IMessageBrokerFactory messageBrokerFactory,
     IRoutingConvention routingConvention,
     IMessageContextAccessor messageContextAccessor,
-    MessagePublisherPipeline messagePublishPipeline
+    MessagePublishPipeline messagePublishPipeline
 ) : IMessagePublisher
 {
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
     readonly IRoutingConvention _routingConvention = routingConvention;
     readonly IMessageContextAccessor _messageContextAccessor = messageContextAccessor;
     readonly LinkedList<ulong> outstandingConfirms = new();
-    readonly MessagePublisherPipeline _messagePublishPipeline = messagePublishPipeline;
+    readonly MessagePublishPipeline _messagePublishPipeline = messagePublishPipeline;
 
     public async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default)
         where T : IMessage
     {
-        await _messagePublishPipeline.ExecuteAsync(message, FinalPublishAsync, cancellationToken);
+        await _messagePublishPipeline.ExecuteAsync(message, FinalPublishMiddlewareAsync, cancellationToken);
     }
 
-    public async Task FinalPublishAsync<T>(T message, CancellationToken cancellationToken = default)
+    public async Task FinalPublishMiddlewareAsync<T>(T message, CancellationToken cancellationToken = default)
         where T : IMessage
     {
         var (exchange, routingKey) = _routingConvention.ResolveFor(typeof(T));

@@ -1,15 +1,15 @@
 ﻿namespace ClientManager.Shared.Messaging;
 
-public class MessagePublisherPipeline(IEnumerable<IMessagePublishMiddleware> messagePublishMiddlewares)
+public class MessagePublishPipeline
 {
-    IEnumerable<IMessagePublishMiddleware> _messagePublishMiddlewares = messagePublishMiddlewares.ToList();
+    readonly List<IMessagePublishMiddleware> _messagePublishMiddlewares = [];
 
     public Task ExecuteAsync<T>(T message, MessagePublishDeleagte<T> finalHandler, CancellationToken cancellationToken)
         where T : IMessage
     {
         MessagePublishDeleagte<T> next = finalHandler;
 
-        foreach (var middleware in _messagePublishMiddlewares.Reverse())
+        foreach (var middleware in _messagePublishMiddlewares.AsEnumerable().Reverse())
         {
             var current = middleware;
             var nextCopy = next;
@@ -17,5 +17,11 @@ public class MessagePublisherPipeline(IEnumerable<IMessagePublishMiddleware> mes
         }
 
         return next(message, cancellationToken);
+    }
+
+    public MessagePublishPipeline Use(IMessagePublishMiddleware middleware)
+    {
+        _messagePublishMiddlewares.Add(middleware);
+        return this;
     }
 }
