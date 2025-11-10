@@ -29,7 +29,23 @@ builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
 builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientService, ClientService>();
-builder.Services.AddSingleton<MessagePublisherPipeline>();
+
+// Message Publishing middleware
+builder.Services.AddSingleton<IMessagePublishMiddleware, MessageValidationMiddleware>();
+builder.Services.AddSingleton<MessagePublishPipeline>(sp =>
+{
+    var middlewares = sp.GetServices<IMessagePublishMiddleware>();
+    var pipeline = new MessagePublishPipeline();
+
+    foreach (var middleware in middlewares.Reverse())
+    {
+        pipeline.Use(middleware);
+    }
+
+    return pipeline;
+});
+
+// Broker and database connections
 builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {
     // Get RabbitMQ connection configuration from DI
