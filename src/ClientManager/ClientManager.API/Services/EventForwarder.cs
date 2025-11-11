@@ -42,7 +42,7 @@ public class EventForwarder(IMessageBrokerFactory messageBrokerFactory, IHubCont
             var eventInterface = _interfaceCache[queueName];
             var responseDto = eventInterface.GetMethod("ToResponse")!.Invoke(messageEvent, null);
             _logger.LogInformation(
-                "Forwarding event {event} [correlationId: {correlationId}, causationId: {causationId}]",
+                "Forwarding event\n\t {@Event}\n\t [correlationId: {correlationId}, causationId: {causationId}]",
                 responseDto,
                 envelope.CorrelationId,
                 envelope.CausationId
