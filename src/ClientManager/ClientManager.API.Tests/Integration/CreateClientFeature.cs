@@ -50,15 +50,17 @@ internal class CreateClientFeature
             builder.AddConsole().SetMinimumLevel(LogLevel.Debug);
         });
         var logger = loggerFactory.CreateLogger<MessageValidationMiddleware>();
+        var publisherLogger = loggerFactory.CreateLogger<MessagePublisher>();
 
         var publishMessageList = new List<IMessagePublishMiddleware>();
 
         _messageBrokerFactory = new MessageBrokerFactory(_rabbitMqConnectionConfiguration);
         _routingConvention = new RoutingConvention();
         _messageContextAccessor = new MessageContextAccessor();
+        _messageContextAccessor.GetOrCreateContext();
         _messagePublisherPipeline = new MessagePublishPipeline();
         _messagePublisherPipeline.Use(new MessageValidationMiddleware(logger));
-        _messagePublisher = new MessagePublisher(_messageBrokerFactory, _routingConvention, _messageContextAccessor, _messagePublisherPipeline);
+        _messagePublisher = new MessagePublisher(_messageBrokerFactory, _routingConvention, _messageContextAccessor, _messagePublisherPipeline, publisherLogger);
 
         var options = new DbContextOptionsBuilder<ReadOnlyAppDbContext>().UseInMemoryDatabase("ReadOnlyTestDb").Options;
         _readonlyAppDbContext = new ReadOnlyAppDbContext(options);
