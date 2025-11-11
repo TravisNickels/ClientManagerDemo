@@ -39,6 +39,7 @@ builder.Services.AddSingleton<IRoutingConvention, RoutingConvention>();
 
 // Message Publishing middleware
 builder.Services.AddSingleton<IMessagePublishMiddleware, MessageValidationMiddleware>();
+builder.Services.AddSingleton<IMessagePublishMiddleware, ContextEnrichmentMiddleware>();
 builder.Services.AddSingleton<MessagePublishPipeline>(sp =>
 {
     var middlewares = sp.GetServices<IMessagePublishMiddleware>();
