@@ -6,4 +6,6 @@ public interface IMessageContextAccessor
     MessageContext GetOrCreateContext();
     void SetCurrentContext(MessageContext context);
     void SetCausationId(Guid messageId);
+
+    void ClearContext();
 }

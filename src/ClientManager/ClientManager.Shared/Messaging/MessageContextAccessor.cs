@@ -30,4 +30,9 @@ public class MessageContextAccessor : IMessageContextAccessor
         get => _current.Value;
         private set => _current.Value = value;
     }
+
+    public void ClearContext()
+    {
+        _current.Value = null;
+    }
 }
