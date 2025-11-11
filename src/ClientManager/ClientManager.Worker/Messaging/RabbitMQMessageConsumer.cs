@@ -88,7 +88,7 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         var message = jsonElement.Deserialize(messageType);
 
         var messageContext = GetMessageContext(envelope);
-        messageContextAccessor.Current = messageContext;
+        messageContextAccessor.SetCurrentContext(messageContext);
 
         _logger.LogInformation("Received message from {queue}: \n\t[correlationId: {correlationId}]\n\t{@Message}", queueName, messageContext.CorrelationId, message);
 
