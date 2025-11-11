@@ -25,7 +25,7 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
             }
         );
 
-        _logger.LogInformation("ClientCreatedHandler processed {client}", message.FirstName);
+        _logger.LogInformation("CreateClientHandler processed {client}", message.FirstName);
 
         var createdEvent = new ClientCreated
         {

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ClientManager.Shared.Contracts.Commands;
+﻿using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;

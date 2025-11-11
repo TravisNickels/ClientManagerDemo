@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using ClientManager.API.Services;
 using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
@@ -7,7 +8,6 @@ using ClientManager.Shared.Models;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Testcontainers.RabbitMq;
 
 namespace ClientManager.API.Tests.Unit;
 

@@ -8,6 +8,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Logging
+builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration).Enrich.FromLogContext().Enrich.WithProperty("Service", "API"));
+
 // Load .env file if it exists
 ConfigurationHelper.LoadDotEnvFile();
 builder.Configuration.AddEnvironmentVariables();
@@ -25,10 +28,14 @@ builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.AddHealthChecks();
 builder.Services.AddHostedService<EventForwarder>();
-builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
-builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
-builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientService, ClientService>();
+
+// Context accessor using AsyncLocal to store per-message context
+builder.Services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
+
+// Core publishing components
+builder.Services.AddSingleton<IMessagePublisher, MessagePublisher>();
+builder.Services.AddSingleton<IRoutingConvention, RoutingConvention>();
 
 // Message Publishing middleware
 builder.Services.AddSingleton<IMessagePublishMiddleware, MessageValidationMiddleware>();
@@ -60,8 +67,6 @@ builder.Services.AddDbContext<AppDbContext, ReadOnlyAppDbContext>(
         options.UseNpgsql(postgresConfig.ToConnectionString());
     }
 );
-
-builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration).Enrich.FromLogContext().Enrich.WithProperty("Service", "API"));
 
 var app = builder.Build();
 

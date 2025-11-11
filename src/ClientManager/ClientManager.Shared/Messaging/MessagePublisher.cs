@@ -36,7 +36,7 @@ public class MessagePublisher(
 
         var props = new BasicProperties
         {
-            MessageId = envelope.MessageId.ToString(),
+            MessageId = envelope.EnvelopeId.ToString(),
             CorrelationId = envelope.CorrelationId.ToString(),
             Timestamp = new AmqpTimestamp(envelope.CreatedUtc.ToUnixTimeSeconds()),
             Type = typeof(T).Name,

@@ -41,7 +41,12 @@ public class EventForwarder(IMessageBrokerFactory messageBrokerFactory, IHubCont
 
             var eventInterface = _interfaceCache[queueName];
             var responseDto = eventInterface.GetMethod("ToResponse")!.Invoke(messageEvent, null);
-            _logger.LogInformation("Forwarding event {event} [correlationId: {correlationId}]", responseDto, envelope.CorrelationId);
+            _logger.LogInformation(
+                "Forwarding event {event} [correlationId: {correlationId}, causationId: {causationId}]",
+                responseDto,
+                envelope.CorrelationId,
+                envelope.CausationId
+            );
             await _hub.Clients.All.SendAsync(responseDto!.GetType().Name, responseDto, cancellationToken);
             await channel.BasicAckAsync(ea.DeliveryTag, false, cancellationToken);
         };

@@ -25,7 +25,7 @@ internal class MessageValidationMiddlewareTests
     }
 
     [Test]
-    public async Task MessageValidationMiddleware_WhenCreateClientMessageIsVaild_ShouldPass()
+    public async Task MessageValidationMiddleware_WhenClientIsVaild_ShouldPass()
     {
         var logger = new FakeLogger<MessageValidationMiddleware>();
 
@@ -38,7 +38,7 @@ internal class MessageValidationMiddlewareTests
     }
 
     [Test]
-    public async Task MessageValidationMiddleware_WhenCreateClientMessageIsMissingFirstName_ShouldWarnWithAnnotationMessage()
+    public async Task MessageValidationMiddleware_WhenClientIsMissingFirstName_ShouldWarnWithAnnotation()
     {
         var logger = new FakeLogger<MessageValidationMiddleware>();
 
