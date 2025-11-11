@@ -50,8 +50,17 @@ public class MessagePublisher(
 
     MessageEnvelope<T> CreateEnvelope<T>(T message)
     {
+        if (_messageContextAccessor.Current is null)
+            throw new NullReferenceException("Current context accessor is is not set.  Call GetOrCreateContext() first.");
+
         var context = _messageContextAccessor.Current;
-        var correlationId = context?.CorrelationId ?? Guid.NewGuid();
-        return new MessageEnvelope<T> { Message = message, CorrelationId = correlationId };
+        var correlationId = context!.CorrelationId; // ?? Guid.NewGuid();
+        var causationId = context.CausationId ?? Guid.Empty;
+        return new MessageEnvelope<T>
+        {
+            Message = message,
+            CorrelationId = correlationId,
+            CausationId = causationId
+        };
     }
 }
