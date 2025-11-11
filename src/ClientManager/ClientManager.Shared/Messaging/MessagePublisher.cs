@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
 namespace ClientManager.Shared.Messaging;
@@ -8,19 +9,40 @@ public class MessagePublisher(
     IMessageBrokerFactory messageBrokerFactory,
     IRoutingConvention routingConvention,
     IMessageContextAccessor messageContextAccessor,
-    MessagePublishPipeline messagePublishPipeline
+    MessagePublishPipeline messagePublishPipeline,
+    ILogger<MessagePublisher>? logger
 ) : IMessagePublisher
 {
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
     readonly IRoutingConvention _routingConvention = routingConvention;
     readonly IMessageContextAccessor _messageContextAccessor = messageContextAccessor;
-    readonly LinkedList<ulong> outstandingConfirms = new();
     readonly MessagePublishPipeline _messagePublishPipeline = messagePublishPipeline;
+    readonly ILogger<MessagePublisher>? _logger = logger;
+    readonly LinkedList<ulong> outstandingConfirms = new();
 
     public async Task PublishAsync<T>(T message, CancellationToken cancellationToken = default)
         where T : IMessage
     {
-        await _messagePublishPipeline.ExecuteAsync(message, FinalPublishMiddlewareAsync, cancellationToken);
+        var context = _messageContextAccessor.GetOrCreateContext();
+        try
+        {
+            _logger?.LogDebug("Starting publish for message {MessageType} with CorrelationId {CorrelationId}", typeof(T).Name, context.CorrelationId);
+
+            await _messagePublishPipeline.ExecuteAsync(message, FinalPublishMiddlewareAsync, cancellationToken);
+
+            _logger?.LogInformation("Successfully published message {MessageType}", typeof(T).Name);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error publishing message {MessageType}", typeof(T).Name);
+            throw;
+        }
+        finally
+        {
+            _messageContextAccessor.ClearContext();
+
+            _logger?.LogDebug("Message context cleared for {MessageType}", typeof(T).Name);
+        }
     }
 
     public async Task FinalPublishMiddlewareAsync<T>(T message, CancellationToken cancellationToken = default)
@@ -51,10 +73,10 @@ public class MessagePublisher(
     MessageEnvelope<T> CreateEnvelope<T>(T message)
     {
         if (_messageContextAccessor.Current is null)
-            throw new NullReferenceException("Current context accessor is is not set.  Call GetOrCreateContext() first.");
+            throw new NullReferenceException("Current context accessor is not set.  Call GetOrCreateContext() first.");
 
         var context = _messageContextAccessor.Current;
-        var correlationId = context!.CorrelationId; // ?? Guid.NewGuid();
+        var correlationId = context!.CorrelationId;
         var causationId = context.CausationId ?? Guid.Empty;
         return new MessageEnvelope<T>
         {
