@@ -2,6 +2,10 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
+
+# Install curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 USER $APP_UID
 WORKDIR /app
 
@@ -14,7 +18,7 @@ COPY ["./ClientManager.Shared/ClientManager.Shared.csproj", "ClientManager.Share
 RUN dotnet restore "./ClientManager.Worker/ClientManager.Worker.csproj"
 COPY ./ClientManager.Worker ./ClientManager.Worker
 COPY ./ClientManager.Shared ./ClientManager.Shared
-WORKDIR "/src"
+
 RUN dotnet build "./ClientManager.Worker/ClientManager.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
