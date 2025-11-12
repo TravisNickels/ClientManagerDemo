@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: ./ClientManager
+      dockerfile: ClientManager.API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    volumes: []
+
+  worker:
+    build:
+      context: ./ClientManager
+      dockerfile: ClientManager.Worker/Dockerfile.dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      CHOKIDAR_USEPOLLING: false
