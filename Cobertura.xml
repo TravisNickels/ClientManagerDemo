@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.2803129074315515" branch-rate="0.3072289156626506" lines-covered="215" lines-valid="767" branches-covered="51" branches-valid="166" complexity="264" version="0" timestamp="1762989729">
+<coverage line-rate="0.2803129074315515" branch-rate="0.3072289156626506" lines-covered="215" lines-valid="767" branches-covered="51" branches-valid="166" complexity="264" version="0" timestamp="1762990462">
   <sources>
     <source>/home/runner/work/ClientManagerDemo/ClientManagerDemo/src/ClientManager/</source>
     <source>/home/runner/work/ClientManagerDemo/ClientManagerDemo/src/ClientManager/ClientManager.Shared/</source>
