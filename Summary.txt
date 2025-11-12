@@ -1,0 +1,60 @@
+Summary
+  Generated on: 11/12/2025 - 22:56:53
+  Coverage date: 11/12/2025 - 22:56:31 - 11/12/2025 - 22:56:50
+  Parser: MultiReport (3x Cobertura)
+  Assemblies: 3
+  Classes: 34
+  Files: 35
+  Line coverage: 28%
+  Covered lines: 215
+  Uncovered lines: 552
+  Coverable lines: 767
+  Total lines: 1447
+  Branch coverage: 30.7% (51 of 166)
+  Covered branches: 51
+  Total branches: 166
+  Method coverage: 51.9% (66 of 127)
+  Full method coverage: 48% (61 of 127)
+  Covered methods: 66
+  Fully covered methods: 61
+  Total methods: 127
+
+ClientManager.API                                                      19.3%
+  ClientManager.API.Controllers.ClientController                       76.1%
+  ClientManager.API.Mappers.ClientMapper                                 50%
+  ClientManager.API.Services.ClientService                             66.6%
+  ClientManager.API.Services.EventForwarder                               0%
+  Program                                                                 0%
+
+ClientManager.Shared                                                   63.2%
+  ClientManager.Shared.Configuration.ConfigurationHelper                  0%
+  ClientManager.Shared.Configuration.PostgresConnectionConfiguration      0%
+  ClientManager.Shared.Configuration.RabbitMQConnectionConfiguration    100%
+  ClientManager.Shared.Contracts.Commands.CreateClient                  100%
+  ClientManager.Shared.Contracts.Events.ClientCreated                     0%
+  ClientManager.Shared.Data.AppDbContext                                100%
+  ClientManager.Shared.Data.ReadOnlyAppDbContext                       77.7%
+  ClientManager.Shared.DTOs.Requests.CreateClientRequest                100%
+  ClientManager.Shared.DTOs.Responses.ClientResponse                    100%
+  ClientManager.Shared.DTOs.Responses.ErrorResponse                     100%
+  ClientManager.Shared.Messaging.ContextEnrichmentMiddleware              0%
+  ClientManager.Shared.Messaging.MessageBrokerFactory                    68%
+  ClientManager.Shared.Messaging.MessageContext                         100%
+  ClientManager.Shared.Messaging.MessageContextAccessor                  50%
+  ClientManager.Shared.Messaging.MessageEnvelope<T>                     100%
+  ClientManager.Shared.Messaging.MessagePublisher                      92.1%
+  ClientManager.Shared.Messaging.MessagePublishPipeline                 100%
+  ClientManager.Shared.Messaging.MessageValidationMiddleware            100%
+  ClientManager.Shared.Messaging.RoutingConvention                      100%
+  ClientManager.Shared.Models.Client                                    100%
+  ClientManager.Shared.Models.Phone                                       0%
+
+ClientManager.Worker                                                    1.8%
+  ClientManager.Worker.Administration.ServiceCollectionExtensions         0%
+  ClientManager.Worker.Handlers.CreateClientHandler                       0%
+  ClientManager.Worker.Messaging.RabbitMQMessageConsumer                  0%
+  ClientManager.Worker.Migrations.AppDbContextModelSnapshot               0%
+  ClientManager.Worker.Migrations.InitialCreate                           0%
+  ClientManager.Worker.Repositories.ClientRepository                    100%
+  ClientManager.Worker.Worker                                             0%
+  Program                                                                 0%
