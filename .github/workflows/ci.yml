@@ -1,4 +1,4 @@
-name: CI - ClientManager
+﻿name: CI - ClientManager
 
 on:
   push:
@@ -6,13 +6,16 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 defaults:
   run:
     shell: pwsh
 
 jobs:
   build:
-    name: Build & Test (.NET 9)
+    name: Test & Coverage (.NET 9)
     runs-on: ubuntu-latest
 
     steps:
@@ -30,5 +33,78 @@ jobs:
       - name: Build
         run: dotnet build src/ClientManager/ClientManager.sln -c Release --no-restore
 
-      - name: Test
-        run: dotnet test src/ClientManager/ClientManager.sln -c Release --no-build --verbosity normal
+      - name: Test with coverage
+        run: |
+            dotnet test src/ClientManager/ClientManager.sln `
+              -c Release `
+              --no-build `
+              --collect:"XPlat Code Coverage" `
+              /p:CoverletOutput=TestResults/coverage/ `
+              /p:CoverletOutputFormat=cobertura `
+      
+      - name: Generate coverage summary and badge
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+
+          reportgenerator `
+              "-reports:**/TestResults/**/coverage.cobertura.xml" `
+              "-targetdir:coverage-report" `
+              "-reporttypes:Html;TextSummary;Badges;Cobertura"
+
+      - name: Extract coverage percentage
+        id: coverage
+        run: |
+          $file = "coverage-report/Cobertura.xml"
+          if (-not (Test-Path $file)) {
+            Write-Error "Expected Cobertura.xml not found at $file"
+            exit 1
+          }
+          [xml]$xml = Get-Content $file
+          $percent = [math]::Floor([double]$xml.coverage.'line-rate' * 100)
+          "coverage=$percent" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Extracted coverage: $percent%"
+
+      - name: Create coverage badge JSON
+        run: |
+          $coverage = '${{ steps.coverage.outputs.coverage }}' -as [int]
+          $color = "red"
+          if ($coverage -ge 90) { $color = "brightgreen" }
+          elseif ($coverage -ge 75) { $color = "green" }
+          elseif ($coverage -ge 50) { $color = "yellow" }
+
+          $json = @{
+            schemaVersion = 1
+            label = "coverage"
+            message = "$coverage%"
+            color = $color
+          } | ConvertTo-Json -Compress
+
+          $json | Set-Content -Path "coverage-report/coverage-badge.json"
+          Write-Host "Created badge JSON with color: $color and coverage: $coverage%"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
+
+      - name: Add coverage summary to workflow output
+        if: always()
+        run: |
+          $coverage = "${{ steps.coverage.outputs.coverage }}"
+          $reportUrl = "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          @"
+          ### 🧪 Test Coverage Summary
+
+          **Coverage:** $coverage%
+
+          [⬇️ Download full HTML report]($reportUrl)
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+
+      - name: Publish coverage report to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./coverage-report
+          keep_files: true
