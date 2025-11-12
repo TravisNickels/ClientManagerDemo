@@ -4,6 +4,7 @@
 [![Vue](https://img.shields.io/badge/Vue-3.0-green)]()
 [![RabbitMQ](https://img.shields.io/badge/Messaging-RabbitMQ-orange)]()
 [![Docker](https://img.shields.io/badge/Container-Docker-blue)]()
+[![Coverage](https://img.shields.io/endpoint?url=https://travisnickels.github.io/ClientManagerDemo/coverage-badge.json)](https://travisnickels.github.io/ClientManagerDemo/)
 
 A full-stack, event-driven demo application that demonstrates modern distributed architecture with .NET 9, PostgreSQL, RabbitMQ, Vue 3 (Vite + Pinia), and Docker Compose.
 Designed to showcase scalable, testable patterns and production-grade developer workflows.
