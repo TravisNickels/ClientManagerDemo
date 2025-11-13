@@ -10,9 +10,10 @@ services:
   worker:
     build:
       context: ./ClientManager
-      dockerfile: ClientManager.Worker/Dockerfile.dev
+      dockerfile: ClientManager.Worker/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+    volumes: []
 
   frontend:
     build:
@@ -20,3 +21,4 @@ services:
       dockerfile: Dockerfile
     environment:
       CHOKIDAR_USEPOLLING: false
+    volumes: []
