@@ -92,13 +92,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    # Check the worker log to see if the string 'Worker running at' exists in the last 20 lines within the last minute
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "find /src/ClientManager.Worker/bin/Debug/net9.0/Logs/worker.log -mmin -1 -exec tail -n 20 {} \\; | grep -q 'Worker running at' || exit 1",
-        ]
+      test: ["CMD", "test", "-f", "/tmp/healthy"]
       interval: 10s
       timeout: 5s
       retries: 5

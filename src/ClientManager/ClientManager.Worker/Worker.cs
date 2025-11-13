@@ -9,9 +9,24 @@ public class Worker(ILogger<Worker> logger, IMessageConsumer messageConsumer) : 
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await _messageConsumer.StartAsync(cancellationToken);
+        var tempPath = Path.GetTempPath();
+        var healthyFile = Path.Combine(tempPath, "healthy");
 
-        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+        try
+        {
+            await _messageConsumer.StartAsync(cancellationToken);
+
+            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+
+            // For docker health checks
+            File.WriteAllText(healthyFile, "ready");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Worker failed startup.");
+            File.Delete(healthyFile);
+        }
+
         await Task.Delay(Timeout.Infinite, cancellationToken);
     }
 }
