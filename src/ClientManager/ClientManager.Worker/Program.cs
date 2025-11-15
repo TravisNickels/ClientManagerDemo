@@ -1,6 +1,7 @@
 using ClientManager.Shared.Configuration;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
+using ClientManager.Shared.Messaging.Middleware;
 using ClientManager.Worker;
 using ClientManager.Worker.Administration;
 using ClientManager.Worker.Messaging;
@@ -38,8 +39,37 @@ builder.Services.AddScoped<IMessageContextAccessor, MessageContextAccessor>();
 builder.Services.AddScoped<IRoutingConvention, RoutingConvention>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMessagePublisher, MessagePublisher>();
-builder.Services.AddSingleton<MessagePublishPipeline>();
+
 builder.Services.AddSingleton<MessageTypeRegistry>();
+
+builder.Services.AddSingleton<IMessageConsumeMiddleware, ExtractEnvelopeMiddleware>();
+builder.Services.AddSingleton<IMessageConsumeMiddleware, MessageTypeResolutionMiddleware>();
+builder.Services.AddSingleton<IMessageConsumeMiddleware, ExtractMessageMiddleware>();
+builder.Services.AddSingleton<IMessageConsumeMiddleware, ScopeMessageContextMiddleware>();
+builder.Services.AddSingleton<MessageConsumePipeline>(sp =>
+{
+    var middlewares = sp.GetServices<IMessageConsumeMiddleware>();
+    var pipeline = new MessageConsumePipeline();
+
+    foreach (var middleware in middlewares)
+    {
+        pipeline.Use(middleware);
+    }
+
+    return pipeline;
+});
+builder.Services.AddSingleton<MessagePublishPipeline>(sp =>
+{
+    var middlewares = sp.GetServices<IMessagePublishMiddleware>();
+    var pipeline = new MessagePublishPipeline();
+
+    foreach (var middleware in middlewares)
+    {
+        pipeline.Use(middleware);
+    }
+
+    return pipeline;
+});
 builder.Services.AddSingleton<IMessageConsumer, RabbitMQMessageConsumer>();
 builder.Services.AddSingleton<IMessageBrokerFactory>(sp =>
 {

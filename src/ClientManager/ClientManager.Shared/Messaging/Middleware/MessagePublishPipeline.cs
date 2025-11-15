@@ -4,7 +4,7 @@ public class MessagePublishPipeline
 {
     readonly List<IMessagePublishMiddleware> _messagePublishMiddlewares = [];
 
-    public Task ExecuteAsync<T>(T message, MessagePublishDeleagte<T> finalHandler, CancellationToken cancellationToken)
+    public Task ExecuteAsync<T>(T message, MessagePublishDeleagte<T> finalHandler, CancellationToken cancellationToken = default)
         where T : IMessage
     {
         MessagePublishDeleagte<T> next = finalHandler;
