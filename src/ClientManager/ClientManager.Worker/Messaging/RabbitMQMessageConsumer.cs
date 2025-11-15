@@ -71,7 +71,7 @@ public class RabbitMQMessageConsumer(
         var handler =
             context.Scope.Value.ServiceProvider.GetService(handlerType)
             ?? throw new InvalidOperationException($"No handler registered for message type {context.MessageType.FullName}.");
-        var messageContext = context.MesssageContext;
+        var messageContext = context.MessageContext;
 
         if (handler is not null && context.Message is not null)
         {

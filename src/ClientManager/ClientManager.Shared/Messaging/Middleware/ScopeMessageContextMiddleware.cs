@@ -17,15 +17,15 @@ public class ScopeMessageContextMiddleware(IServiceScopeFactory serviceScopeFact
 
         var messageContextAccessor = scope.ServiceProvider.GetRequiredService<IMessageContextAccessor>();
 
-        context.MesssageContext = GetMessageContext(context.Envelope);
-        messageContextAccessor.SetCurrentContext(context.MesssageContext);
+        context.MessageContext = GetMessageContext(context.Envelope);
+        messageContextAccessor.SetCurrentContext(context.MessageContext);
 
         context.Scope = scope;
 
         _logger.LogInformation(
             "Received message from {messageType}: \n\t[correlationId: {correlationId}]\n\t{@Message}",
             context.MessageType.Name,
-            context.MesssageContext.CorrelationId,
+            context.MessageContext.CorrelationId,
             context.Message
         );
 

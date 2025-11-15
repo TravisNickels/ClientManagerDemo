@@ -9,5 +9,5 @@ public class MessageConsumeContext
     public object? Message { get; set; }
     public Type? MessageType { get; set; }
     public AsyncServiceScope? Scope { get; set; }
-    public MessageContext? MesssageContext { get; set; }
+    public MessageContext? MessageContext { get; set; }
 }
