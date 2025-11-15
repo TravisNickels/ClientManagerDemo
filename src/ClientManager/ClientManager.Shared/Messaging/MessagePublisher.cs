@@ -61,10 +61,13 @@ public class MessagePublisher(
             MessageId = envelope.EnvelopeId.ToString(),
             CorrelationId = envelope.CorrelationId.ToString(),
             Timestamp = new AmqpTimestamp(envelope.CreatedUtc.ToUnixTimeSeconds()),
+            DeliveryMode = DeliveryModes.Persistent,
+            Headers = new Dictionary<string, object?>(),
             Type = typeof(T).Name,
         };
 
-        ulong sequenceNumber = await channel.GetNextPublishSequenceNumberAsync();
+        ulong sequenceNumber = await channel.GetNextPublishSequenceNumberAsync(cancellationToken);
+        props.Headers["x-publish-sequence"] = sequenceNumber.ToString();
         outstandingConfirms.AddLast(sequenceNumber);
 
         await channel.BasicPublishAsync(exchange, routingKey, mandatory: true, basicProperties: props, body, cancellationToken);
