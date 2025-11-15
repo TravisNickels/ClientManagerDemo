@@ -2,10 +2,16 @@
 
 namespace ClientManager.Shared.Messaging;
 
-public class MessageTypeRegistry(Assembly[]? assemblies = null)
+public class MessageTypeRegistry
 {
-    readonly Assembly[] _assembliesToScan = assemblies ?? AppDomain.CurrentDomain.GetAssemblies();
-    public IReadOnlyDictionary<string, Type> MessageTypeCache => DiscoverMessageTypes();
+    readonly Assembly[] _assembliesToScan;
+    public IReadOnlyDictionary<string, Type> MessageTypeCache;
+
+    public MessageTypeRegistry(Assembly[]? assemblies = null)
+    {
+        _assembliesToScan = assemblies ?? AppDomain.CurrentDomain.GetAssemblies();
+        MessageTypeCache = DiscoverMessageTypes();
+    }
 
     Dictionary<string, Type> DiscoverMessageTypes() =>
         _assembliesToScan
