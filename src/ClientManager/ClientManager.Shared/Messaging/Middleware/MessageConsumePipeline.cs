@@ -6,6 +6,8 @@ public class MessageConsumePipeline
 
     public Task ExecuteAsync(MessageConsumeContext message, MessageConsumeDelegate finalHandler, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(finalHandler, nameof(finalHandler));
+
         MessageConsumeDelegate next = finalHandler;
 
         foreach (var middleware in _messageConsumeMiddlewares.AsEnumerable().Reverse())
