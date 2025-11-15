@@ -13,7 +13,7 @@ public class ScopeMessageContextMiddleware(IServiceScopeFactory serviceScopeFact
         ArgumentNullException.ThrowIfNull(context.Envelope, nameof(context.Envelope));
         ArgumentNullException.ThrowIfNull(context.MessageType, nameof(context.MessageType));
 
-        await using var scope = _scopeFactory.CreateAsyncScope();
+        var scope = _scopeFactory.CreateAsyncScope();
 
         var messageContextAccessor = scope.ServiceProvider.GetRequiredService<IMessageContextAccessor>();
 
@@ -36,6 +36,7 @@ public class ScopeMessageContextMiddleware(IServiceScopeFactory serviceScopeFact
         finally
         {
             await scope.DisposeAsync();
+            context.Scope = null;
         }
     }
 
