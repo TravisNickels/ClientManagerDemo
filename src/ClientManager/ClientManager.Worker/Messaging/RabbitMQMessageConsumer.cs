@@ -1,20 +1,27 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
-using System.Text.Json;
 using ClientManager.Shared.Messaging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace ClientManager.Worker.Messaging;
 
-public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, IMessageBrokerFactory messageBrokerFactory, ILogger<RabbitMQMessageConsumer> logger)
-    : IMessageConsumer
+public class RabbitMQMessageConsumer(
+    IServiceScopeFactory serviceScopeFactory,
+    MessageConsumePipeline messageConsumePipeline,
+    IMessageBrokerFactory messageBrokerFactory,
+    MessageTypeRegistry messageTypeRegistry,
+    ILogger<RabbitMQMessageConsumer> logger
+) : IMessageConsumer
 {
     readonly IServiceScopeFactory _scopeFactory = serviceScopeFactory;
+    readonly MessageConsumePipeline _messageConsumePipeline = messageConsumePipeline;
     readonly IMessageBrokerFactory _messageBrokerFactory = messageBrokerFactory;
+
     readonly ILogger<RabbitMQMessageConsumer> _logger = logger;
     readonly ConcurrentDictionary<string, IChannel> _channels = new();
-    readonly IReadOnlyDictionary<string, Type> _messageTypeCache = DiscoverMessageTypes().ToDictionary(t => t.Name, t => t);
+
+    readonly IReadOnlyDictionary<string, Type> _messageTypeCache = messageTypeRegistry.MessageTypeCache;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -34,9 +41,11 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         consumer.ReceivedAsync += async (_, ea) =>
         {
             var json = Encoding.UTF8.GetString(ea.Body.ToArray());
+            var context = new MessageConsumeContext { RawJson = json };
 
             try
             {
+                await _messageConsumePipeline.ExecuteAsync(context, DispatchToHandler, cancellationToken);
                 await channel.BasicAckAsync(ea.DeliveryTag, multiple: false, cancellationToken);
             }
             catch (Exception ex)
@@ -50,6 +59,27 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
         _logger.LogInformation("Listening on queue: {queue}", queueName);
     }
 
+    public static async Task DispatchToHandler(MessageConsumeContext context, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(context.MessageType, nameof(context.MessageType));
+        if (!context.Scope.HasValue)
+        {
+            throw new NullReferenceException($"Message scope for DI is not set for message type {context.MessageType.FullName}.");
+        }
+
+        var handlerType = typeof(IHandleMessage<>).MakeGenericType(context.MessageType);
+        var handler =
+            context.Scope.Value.ServiceProvider.GetService(handlerType)
+            ?? throw new InvalidOperationException($"No handler registered for message type {context.MessageType.FullName}.");
+        var messageContext = context.MesssageContext;
+
+        if (handler is not null && context.Message is not null)
+        {
+            dynamic dynamicHandler = handler;
+            await dynamicHandler.HandleAsync((dynamic)context.Message, messageContext, cancellationToken);
+        }
+    }
+
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         foreach (var (queue, channel) in _channels)
@@ -60,14 +90,4 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
 
         _logger.LogInformation("All channels closed.");
     }
-
-    static IEnumerable<Type> DiscoverMessageTypes() =>
-        AppDomain
-            .CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => typeof(ICommand).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-            .ToList();
-
-    static MessageContext GetMessageContext(MessageEnvelope<object> envelope) =>
-        new MessageContext(CorrelationId: envelope.CorrelationId, CausationId: envelope.CausationId, Timestamp: envelope.CreatedUtc);
 }
