@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace ClientManager.Shared.Messaging.Middleware;
 
@@ -10,7 +9,7 @@ public class ExtractEnvelopeMiddleware : IMessageConsumeMiddleware
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         var deserializedEnvelope =
-            JsonSerializer.Deserialize<MessageEnvelope<object>>(context.RawJson) ?? throw new InvalidOperationException("Failed to deserialize message envelope.");
+            JsonSerializer.Deserialize<MessageEnvelope>(context.RawJson) ?? throw new InvalidOperationException("Failed to deserialize message envelope.");
 
         context.Envelope = deserializedEnvelope;
 

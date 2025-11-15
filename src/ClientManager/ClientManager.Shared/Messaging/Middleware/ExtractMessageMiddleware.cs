@@ -12,9 +12,9 @@ public class ExtractMessageMiddleware : IMessageConsumeMiddleware
         ArgumentNullException.ThrowIfNull(context.MessageType, nameof(context.MessageType));
         ArgumentNullException.ThrowIfNull(context.Envelope, nameof(context.Envelope));
 
-        var messageJson = (JsonElement)context.Envelope.Message;
+        var payload = context.Envelope.Payload;
         context.Message =
-            messageJson.Deserialize(context.MessageType) ?? throw new InvalidOperationException($"Failed to deserialize message of type {context.MessageType.FullName}.");
+            payload.Deserialize(context.MessageType) ?? throw new InvalidOperationException($"Failed to deserialize message of type {context.MessageType.FullName}.");
 
         await next(context, cancellationToken);
     }

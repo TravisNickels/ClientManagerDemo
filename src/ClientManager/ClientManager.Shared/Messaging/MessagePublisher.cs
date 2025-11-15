@@ -70,7 +70,7 @@ public class MessagePublisher(
         await channel.BasicPublishAsync(exchange, routingKey, mandatory: true, basicProperties: props, body, cancellationToken);
     }
 
-    MessageEnvelope<T> CreateEnvelope<T>(T message)
+    MessageEnvelope CreateEnvelope(IMessage message)
     {
         if (_messageContextAccessor.Current is null)
             throw new NullReferenceException("Current context accessor is not set.  Call GetOrCreateContext() first.");
@@ -78,9 +78,10 @@ public class MessagePublisher(
         var context = _messageContextAccessor.Current;
         var correlationId = context!.CorrelationId;
         var causationId = context.CausationId ?? Guid.Empty;
-        return new MessageEnvelope<T>
+        return new MessageEnvelope
         {
-            Message = message,
+            MessageType = message.GetType().Name,
+            Payload = JsonSerializer.SerializeToElement(message, message.GetType()),
             CorrelationId = correlationId,
             CausationId = causationId
         };

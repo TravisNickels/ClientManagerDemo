@@ -39,6 +39,6 @@ public class ScopeMessageContextMiddleware(IServiceScopeFactory serviceScopeFact
         }
     }
 
-    static MessageContext GetMessageContext(MessageEnvelope<object> envelope) =>
+    static MessageContext GetMessageContext(MessageEnvelope envelope) =>
         new MessageContext(CorrelationId: envelope.CorrelationId, CausationId: envelope.CausationId, Timestamp: envelope.CreatedUtc);
 }

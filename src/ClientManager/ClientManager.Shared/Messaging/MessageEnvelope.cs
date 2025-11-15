@@ -1,10 +1,13 @@
-﻿namespace ClientManager.Shared.Messaging;
+﻿using System.Text.Json;
 
-public class MessageEnvelope<T>
+namespace ClientManager.Shared.Messaging;
+
+public record MessageEnvelope
 {
     public Guid EnvelopeId { get; set; } = Guid.NewGuid();
-    public Guid CorrelationId { get; set; } = Guid.NewGuid();
-    public Guid CausationId { get; set; } = Guid.Empty;
-    public DateTimeOffset CreatedUtc { get; set; } = DateTimeOffset.UtcNow;
-    public T Message { get; init; } = default!;
+    public string MessageType { get; init; } = string.Empty;
+    public Guid CorrelationId { get; init; } = Guid.NewGuid();
+    public Guid CausationId { get; init; } = Guid.Empty;
+    public DateTimeOffset CreatedUtc { get; } = DateTimeOffset.UtcNow;
+    public JsonElement Payload { get; init; }
 }

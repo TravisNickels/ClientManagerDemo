@@ -33,10 +33,10 @@ public class EventForwarder(IMessageBrokerFactory messageBrokerFactory, IHubCont
             var body = Encoding.UTF8.GetString(ea.Body.ToArray());
             var eventType = _eventTypesCache[queueName];
 
-            var envelope = JsonSerializer.Deserialize<MessageEnvelope<object>>(body);
+            var envelope = JsonSerializer.Deserialize<MessageEnvelope>(body);
             ArgumentNullException.ThrowIfNull(envelope);
 
-            var jsonElement = (JsonElement)envelope.Message;
+            var jsonElement = envelope.Payload;
             var messageEvent = jsonElement.Deserialize(eventType);
 
             var eventInterface = _interfaceCache[queueName];
