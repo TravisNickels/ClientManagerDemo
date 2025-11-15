@@ -37,7 +37,6 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
 
             try
             {
-                await DispatchToHandlers(queueName, json, cancellationToken);
                 await channel.BasicAckAsync(ea.DeliveryTag, multiple: false, cancellationToken);
             }
             catch (Exception ex)
@@ -68,43 +67,6 @@ public class RabbitMQMessageConsumer(IServiceScopeFactory serviceScopeFactory, I
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(ICommand).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
             .ToList();
-
-    async Task DispatchToHandlers(string queueName, string json, CancellationToken cancellationToken)
-    {
-        // Need to create a scope inside the singleton for every message
-        await using var scope = _scopeFactory.CreateAsyncScope();
-        var messageContextAccessor = scope.ServiceProvider.GetRequiredService<IMessageContextAccessor>();
-
-        if (!_messageTypeCache.TryGetValue(queueName, out var messageType))
-        {
-            _logger.LogWarning("No message type found for queue: {queue}", queueName);
-            return;
-        }
-
-        var envelope = JsonSerializer.Deserialize<MessageEnvelope<object>>(json);
-        ArgumentNullException.ThrowIfNull(envelope);
-
-        var jsonElement = (JsonElement)envelope.Message;
-        var message = jsonElement.Deserialize(messageType);
-
-        var messageContext = GetMessageContext(envelope);
-        messageContextAccessor.SetCurrentContext(messageContext);
-
-        _logger.LogInformation("Received message from {queue}: \n\t[correlationId: {correlationId}]\n\t{@Message}", queueName, messageContext.CorrelationId, message);
-
-        // Find handler registered for that message type
-        var handlerType = typeof(IHandleMessage<>).MakeGenericType(messageType);
-        var handlers = scope.ServiceProvider.GetServices(handlerType);
-
-        foreach (var handler in handlers)
-        {
-            if (handler is not null && message is not null)
-            {
-                dynamic dynamicHandler = handler;
-                await dynamicHandler.HandleAsync((dynamic)message, messageContext, cancellationToken);
-            }
-        }
-    }
 
     static MessageContext GetMessageContext(MessageEnvelope<object> envelope) =>
         new MessageContext(CorrelationId: envelope.CorrelationId, CausationId: envelope.CausationId, Timestamp: envelope.CreatedUtc);
