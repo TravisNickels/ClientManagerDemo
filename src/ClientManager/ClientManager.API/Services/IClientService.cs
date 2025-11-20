@@ -7,4 +7,5 @@ public interface IClientService
 {
     Task<CreateClient> SendCreateClientMessage(CreateClient message);
     Task<Client> GetClientById(Guid id);
+    IEnumerable<Client> GetAllClients();
 }

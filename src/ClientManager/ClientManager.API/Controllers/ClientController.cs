@@ -38,6 +38,21 @@ public class ClientController(IClientService clientService) : ControllerBase
         }
     }
 
+    [HttpGet]
+    public ActionResult<IEnumerable<ClientResponse>> GetClients()
+    {
+        try
+        {
+            var clients = _clientService.GetAllClients();
+            var response = clients.Select(ClientMapper.ToResponse).ToList();
+            return (clients is null || !clients.Any()) ? Ok(new List<ClientResponse>()) : Ok(response);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexpected error occurred while retrieving clients.");
+        }
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetClient(Guid id)
     {
