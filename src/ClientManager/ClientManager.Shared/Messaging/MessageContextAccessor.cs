@@ -10,11 +10,6 @@ public class MessageContextAccessor : IMessageContextAccessor
         return Current;
     }
 
-    public void SetCurrentContext(MessageContext context)
-    {
-        Current = context;
-    }
-
     public void SetCausationId(Guid messageId)
     {
         if (messageId == Guid.Empty)
@@ -31,8 +26,7 @@ public class MessageContextAccessor : IMessageContextAccessor
         private set => _current.Value = value;
     }
 
-    public void ClearContext()
-    {
-        _current.Value = null;
-    }
+    public void SetCurrentContext(MessageContext context) => Current = context;
+
+    public void ClearContext() => _current.Value = null;
 }
