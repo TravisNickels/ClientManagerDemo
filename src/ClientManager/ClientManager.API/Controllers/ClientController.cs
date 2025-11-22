@@ -25,7 +25,8 @@ public class ClientController(IClientService clientService) : ControllerBase
         try
         {
             var clientCommand = await _clientService.SendCreateClientMessage(ClientMapper.ToCreateClientCommand(createClientRequest));
-            return AcceptedAtAction(nameof(GetClient), new { id = clientCommand.Id }, ClientMapper.ToResponse(clientCommand));
+            var response = ClientMapper.ToResponse(clientCommand);
+            return AcceptedAtAction(nameof(GetClient), new { id = clientCommand.Id }, response);
         }
         catch (PublishException ex)
         {
