@@ -16,4 +16,6 @@ public class CreateClient : ICommand
     [Required(ErrorMessage = "Client must have an email.")]
     [EmailAddress(ErrorMessage = "Client must have a valid email address.")]
     public string Email { get; set; } = default!;
+
+    public bool IsArchived { get; set; } = default!;
 }

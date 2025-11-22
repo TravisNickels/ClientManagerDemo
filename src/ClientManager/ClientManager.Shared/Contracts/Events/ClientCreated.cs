@@ -9,6 +9,7 @@ public class ClientCreated : IEvent, IEventToResponse<ClientResponse>
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string Email { get; set; } = default!;
+    public bool IsArchived { get; set; } = default!;
 
-    public ClientResponse ToResponse() => new(Id, FirstName, LastName, Email);
+    public ClientResponse ToResponse() => new(Id, FirstName, LastName, Email, IsArchived);
 }
