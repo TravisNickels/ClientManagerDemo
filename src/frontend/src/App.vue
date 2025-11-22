@@ -1,4 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useSignalRStore } from './stores/signalrStore'
+
+const signalRStore = useSignalRStore()
+
+onMounted(async () => {
+  await signalRStore.connect()
+})
+</script>
 
 <template>
   <div id="app">
