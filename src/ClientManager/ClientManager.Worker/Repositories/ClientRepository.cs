@@ -22,4 +22,10 @@ public class ClientRepository(AppDbContext appDbContext) : IClientRepository
         client.IsArchived = isArchived;
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task UpdateAsync(Client client, CancellationToken cancellationToken = default)
+    {
+        _context.Clients.Update(client);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }
