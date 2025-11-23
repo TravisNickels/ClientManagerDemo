@@ -1,5 +1,5 @@
-﻿using ClientManager.Shared.Contracts;
-using ClientManager.Shared.Contracts.Commands;
+﻿using ClientManager.Shared.Contracts.Commands;
+using ClientManager.Shared.Contracts.Events;
 using ClientManager.Shared.Messaging;
 using ClientManager.Worker.Repositories;
 

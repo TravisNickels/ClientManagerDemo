@@ -1,8 +1,7 @@
-﻿using ClientManager.Shared.Contracts.Events;
-using ClientManager.Shared.DTOs.Responses;
+﻿using ClientManager.Shared.DTOs.Responses;
 using ClientManager.Shared.Messaging;
 
-namespace ClientManager.Shared.Contracts;
+namespace ClientManager.Shared.Contracts.Events;
 
 public class ClientArchiveStatusChanged : IEvent, IEventToResponse<ClientResponse>
 {
