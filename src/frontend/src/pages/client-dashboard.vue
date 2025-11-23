@@ -2,8 +2,10 @@
 import { useClientStore } from '@/stores/clientStore'
 import { computed, onMounted, ref, watch } from 'vue'
 import ClientList from '@/components/client-list.vue'
+import NewClientModal from '@/components/new-client-modal.vue'
 
 const clientStore = useClientStore()
+const showNewClientModal = ref<boolean>(false)
 const storedValue = localStorage.getItem('showArchivedClients')
 const showArchivedClients = ref(storedValue === 'true')
 
@@ -28,7 +30,9 @@ onMounted(async () => {
         <input class="form-check-input" type="checkbox" role="switch" v-model="showArchivedClients" />
         <label class="form-check-label">Show Archived</label>
       </div>
+      <button class="btn btn-primary mt-3" @click="showNewClientModal = true">Create New Client</button>
     </div>
+    <NewClientModal v-if="showNewClientModal" @created="clientStore.updateClientsList" @close="showNewClientModal = false" />
     <ClientList :clients="filteredClients" :show-archived-clients="false" />
   </div>
 </template>
