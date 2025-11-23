@@ -30,6 +30,16 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
     //public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.FirstOrDefaultAsync(c => c.Id == id);
     public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.FindAsync(id);
 
+    public async Task<ChangeClientArchiveStatus> SendChangeClientArchiveStatusMessageAsync(ChangeClientArchiveStatus message)
     {
+        try
+        {
+            await _messagePublisher.PublishAsync(message);
+            return message;
+        }
+        catch (PublishException)
+        {
+            throw;
+        }
     }
 }

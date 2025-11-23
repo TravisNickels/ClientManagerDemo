@@ -8,4 +8,5 @@ public interface IClientService
     Task<CreateClient> SendCreateClientMessageAsync(CreateClient message);
     Task<Client?> GetClientByIdAsync(Guid id);
     IEnumerable<Client> GetAllClients();
+    Task<ChangeClientArchiveStatus> SendChangeClientArchiveStatusMessageAsync(ChangeClientArchiveStatus message);
 }
