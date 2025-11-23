@@ -1,5 +1,6 @@
 ﻿using ClientManager.API.Mappers;
 using ClientManager.API.Services;
+using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.DTOs.Requests;
 using ClientManager.Shared.DTOs.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ public class ClientController(IClientService clientService) : ControllerBase
 
         try
         {
-            var clientCommand = await _clientService.SendCreateClientMessage(ClientMapper.ToCreateClientCommand(createClientRequest));
+            var clientCommand = await _clientService.SendCreateClientMessageAsync(ClientMapper.ToCreateClientCommand(createClientRequest));
             var response = ClientMapper.ToResponse(clientCommand);
             return AcceptedAtAction(nameof(GetClient), new { id = clientCommand.Id }, response);
         }
@@ -42,24 +43,19 @@ public class ClientController(IClientService clientService) : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<ClientResponse>> GetClients()
     {
-        try
-        {
-            var clients = _clientService.GetAllClients();
-            var response = clients.Select(ClientMapper.ToResponse).ToList();
-            return (clients is null || !clients.Any()) ? Ok(new List<ClientResponse>()) : Ok(response);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "An unexpected error occurred while retrieving clients.");
-        }
+        var clients = _clientService.GetAllClients()?.Select(ClientMapper.ToResponse).ToList();
+
+        return Ok(clients);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetClient(Guid id)
+    public async Task<ActionResult<ClientResponse>> GetClient(Guid id)
     {
-        var client = await _clientService.GetClientById(id);
-        if (client == null)
-            return NotFound();
+        var client = await _clientService.GetClientByIdAsync(id);
+
+        if (client is null)
+            return NotFound($"Client with ID {id} not found");
+
         return Ok(ClientMapper.ToResponse(client));
     }
 }

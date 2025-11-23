@@ -1,8 +1,8 @@
-﻿using ClientManager.API.Mappers;
-using ClientManager.Shared.Contracts.Commands;
+﻿using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Data;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
+using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client.Exceptions;
 
 namespace ClientManager.API.Services;
@@ -12,7 +12,7 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
     readonly IMessagePublisher _messagePublisher = publisher;
     readonly ReadOnlyAppDbContext _readOnlyAppDbContext = readOnlyAppDbContext;
 
-    public async Task<CreateClient> SendCreateClientMessage(CreateClient message)
+    public async Task<CreateClient> SendCreateClientMessageAsync(CreateClient message)
     {
         try
         {
@@ -25,15 +25,11 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
         }
     }
 
-    public IEnumerable<Client> GetAllClients()
-    {
-        var clients = _readOnlyAppDbContext.Clients;
+    public IEnumerable<Client> GetAllClients() => _readOnlyAppDbContext.Clients;
 
-        return clients;
-    }
+    //public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.FirstOrDefaultAsync(c => c.Id == id);
+    public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.FindAsync(id);
 
-    public Task<Client> GetClientById(Guid id)
     {
-        throw new NotImplementedException();
     }
 }

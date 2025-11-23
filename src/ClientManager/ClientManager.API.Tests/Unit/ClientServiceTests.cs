@@ -53,7 +53,7 @@ internal class ClientServiceTests
 
         // Then it should throw an InvalidOperationException with inner exception message
         var ex = await FluentActions
-            .Invoking(() => clientService.SendCreateClientMessage(newClient))
+            .Invoking(() => clientService.SendCreateClientMessageAsync(newClient))
             .Should()
             .ThrowAsync<Exception>()
             .Where(ex => ex.Message.Contains("Broker down"));

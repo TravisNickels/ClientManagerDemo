@@ -5,7 +5,7 @@ namespace ClientManager.API.Services;
 
 public interface IClientService
 {
-    Task<CreateClient> SendCreateClientMessage(CreateClient message);
-    Task<Client> GetClientById(Guid id);
+    Task<CreateClient> SendCreateClientMessageAsync(CreateClient message);
+    Task<Client?> GetClientByIdAsync(Guid id);
     IEnumerable<Client> GetAllClients();
 }

@@ -34,14 +34,14 @@ internal class ClientControllerTests
             LastName = clientRequest.LastName,
             Email = clientRequest.Email
         };
-        clientResponse = new ClientResponse(Id: client.Id, FirstName: client.FirstName!, LastName: client.LastName!, Email: client.Email!);
+        clientResponse = new ClientResponse(Id: client.Id, FirstName: client.FirstName!, LastName: client.LastName!, Email: client.Email!, IsArchived: false);
     }
 
     [Test]
     public async Task CreateClient_WhenRequestIsValid_ShouldReturnAccepted()
     {
         // When the service is called with valid client, it returns success
-        mockService.Setup(s => s.SendCreateClientMessage(It.IsAny<CreateClient>())).ReturnsAsync(client);
+        mockService.Setup(s => s.SendCreateClientMessageAsync(It.IsAny<CreateClient>())).ReturnsAsync(client);
 
         // When calling the client service with the properly mapped client from the client request
         var result = await controller.CreateClient(clientRequest) as AcceptedAtActionResult;
@@ -50,7 +50,7 @@ internal class ClientControllerTests
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(202);
         result!.Value.Should().BeEquivalentTo(clientResponse);
-        mockService.Verify(s => s.SendCreateClientMessage(It.IsAny<CreateClient>()), Times.Once);
+        mockService.Verify(s => s.SendCreateClientMessageAsync(It.IsAny<CreateClient>()), Times.Once);
     }
 
     [Test]
@@ -74,7 +74,7 @@ internal class ClientControllerTests
         // Given the service will throw an exception when trying to send the create client message
         ulong publishSequenceNumber = 1;
 
-        mockService.Setup(s => s.SendCreateClientMessage(It.IsAny<CreateClient>())).ThrowsAsync(new PublishException(publishSequenceNumber, true));
+        mockService.Setup(s => s.SendCreateClientMessageAsync(It.IsAny<CreateClient>())).ThrowsAsync(new PublishException(publishSequenceNumber, true));
 
         // When calling the controller to create a client
         var result = await controller.CreateClient(clientRequest) as ObjectResult;

@@ -101,7 +101,7 @@ internal class CreateClientFeature
 
         // When sending the create client message
         var clientService = new ClientService(_messagePublisher, _readonlyAppDbContext);
-        var result = await clientService.SendCreateClientMessage(newClient);
+        var result = await clientService.SendCreateClientMessageAsync(newClient);
 
         // Then the client should be enqueued successfully
         result.Should().NotBeNull();
@@ -140,7 +140,7 @@ internal class CreateClientFeature
 
         foreach (var client in clients)
         {
-            var result = await clientService.SendCreateClientMessage(client);
+            var result = await clientService.SendCreateClientMessageAsync(client);
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(client);
         }
