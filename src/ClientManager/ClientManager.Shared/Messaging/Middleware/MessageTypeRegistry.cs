@@ -10,10 +10,10 @@ public class MessageTypeRegistry
     public MessageTypeRegistry(Assembly[]? assemblies = null)
     {
         _assembliesToScan = assemblies ?? AppDomain.CurrentDomain.GetAssemblies();
-        MessageTypeCache = DiscoverMessageTypes();
+        MessageTypeCache = DiscoverCommandMessageTypes();
     }
 
-    Dictionary<string, Type> DiscoverMessageTypes() =>
+    Dictionary<string, Type> DiscoverCommandMessageTypes() =>
         _assembliesToScan
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(ICommand).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
