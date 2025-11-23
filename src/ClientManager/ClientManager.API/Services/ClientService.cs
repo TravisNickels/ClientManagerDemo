@@ -27,15 +27,25 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
 
     public IEnumerable<Client> GetAllClients() => _readOnlyAppDbContext.Clients;
 
-    //public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.FirstOrDefaultAsync(c => c.Id == id);
     public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.FindAsync(id);
 
-    public async Task<ChangeClientArchiveStatus> SendChangeClientArchiveStatusMessageAsync(ChangeClientArchiveStatus message)
+    public async Task SendChangeClientArchiveStatusMessageAsync(ChangeClientArchiveStatus message)
     {
         try
         {
             await _messagePublisher.PublishAsync(message);
-            return message;
+        }
+        catch (PublishException)
+        {
+            throw;
+        }
+    }
+
+    public async Task SendUpdateClientMessageAsync(UpdateClient message)
+    {
+        try
+        {
+            await _messagePublisher.PublishAsync(message);
         }
         catch (PublishException)
         {
