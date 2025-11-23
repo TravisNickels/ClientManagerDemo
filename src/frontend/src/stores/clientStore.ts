@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import axios from 'axios'
-import type { Client } from '@/types/client'
+import type { Client, CreateClientRequest } from '@/types/client'
 import { useSignalRStore } from '@/stores/signalrStore'
 import { SignalrEventNames } from '@/signalr/events'
 
@@ -12,22 +12,28 @@ export const useClientStore = defineStore('clientStore', () => {
   const showArchivedClients = ref<boolean>(false)
   const getActiveClients = computed<Client[]>(() => allClients.value.filter((client) => !client.isArchived))
 
-  async function updateClientsList(): Promise<void> {
-    const response: { data: Client[] } = await apiConnection.get<Client[]>('/api/client')
-    allClients.value = response.data
-  }
-
-  watch(showArchivedClients, updateClientsList)
-
   signalR.on(SignalrEventNames.ClientResponse, async () => {
     console.log('[SignalR] Client update event received — refreshing client list.')
     await updateClientsList()
   })
+
+  const updateClientsList = async (): Promise<void> => {
+    const response: { data: Client[] } = await apiConnection.get<Client[]>('/api/client')
+    allClients.value = response.data
+  }
+
+  const createClientRequest = async (newClient: CreateClientRequest): Promise<Client> => {
+    const response: { data: Client } = await apiConnection.post<Client>('/api/client', newClient)
+    return response.data
+  }
+
+  watch(showArchivedClients, updateClientsList)
 
   return {
     allClients,
     showArchivedClients,
     getActiveClients,
     updateClientsList,
+    createClientRequest,
   }
 })
