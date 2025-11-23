@@ -18,8 +18,7 @@ public class EventForwarder(IMessageBrokerFactory messageBrokerFactory, IHubCont
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var eventTypes = new[] { "ClientCreated" };
-        foreach (var eventType in eventTypes)
+        foreach (var eventType in _eventTypesCache.Keys)
             await SubscribeAsync(eventType, stoppingToken);
     }
 
