@@ -82,6 +82,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync("An unexpected error occured");
+    });
+});
+
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<NotificationHub>("/notifications");
