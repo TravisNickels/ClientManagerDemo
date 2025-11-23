@@ -27,6 +27,11 @@ export const useClientStore = defineStore('clientStore', () => {
     return response.data
   }
 
+  const getClient = async (clientId: string): Promise<Client> => {
+    const response: { data: Client } = await apiConnection.get<Client>(`/api/client/${clientId}`)
+    return response.data
+  }
+
   watch(showArchivedClients, updateClientsList)
 
   return {
@@ -35,5 +40,6 @@ export const useClientStore = defineStore('clientStore', () => {
     getActiveClients,
     updateClientsList,
     createClientRequest,
+    getClient,
   }
 })

@@ -1,5 +1,6 @@
 import ClientDashboard from '@/pages/client-dashboard.vue'
 import ClientHome from '@/pages/client-home.vue'
+import ClientManagement from '@/pages/client-management.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -14,6 +15,12 @@ const router = createRouter({
       path: '/client-dashboard',
       name: 'client-dashboard',
       component: ClientDashboard,
+    },
+    {
+      path: '/client/:id',
+      name: 'client-management',
+      component: ClientManagement,
+      props: true,
     },
   ],
 })
