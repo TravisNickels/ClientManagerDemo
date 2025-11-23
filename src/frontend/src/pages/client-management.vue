@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { Client } from '@/types/client'
+import type { UpdateClientRequest as Client, UpdateClientRequest } from '@/types/client'
 import { useClientStore } from '@/stores/clientStore'
 
 const route = useRoute()
@@ -34,6 +34,26 @@ const archiveClient = async (archive: boolean): Promise<void> => {
   }
 }
 
+const saveClient = async (): Promise<void> => {
+  if (!client.value) return
+
+  const updatedClient: UpdateClientRequest = {
+    id: client.value.id,
+    firstName: client.value.firstName,
+    lastName: client.value.lastName,
+    email: client.value.email,
+    isArchived: client.value.isArchived,
+  }
+
+  try {
+    await clientStore.updateClientRequest(updatedClient)
+    router.push({ name: 'client-dashboard' })
+  } catch (error) {
+    console.error('Failed to save client', error)
+    alert('Could not save client data')
+  }
+}
+
 onMounted(loadClient)
 </script>
 
@@ -42,26 +62,32 @@ onMounted(loadClient)
     <div class="card shadow-sm">
       <div class="card-body">
         <h2 class="card-title mb-4">Edit Client</h2>
-        <!-- <form @submit.prevent="saveClient"> -->
-        <!-- First name -->
-        <div class="mb-3">
-          <label>First Name</label>
-          <input v-model="client.firstName" required class="form-control" />
-        </div>
+        <form @submit.prevent="saveClient">
+          <!-- First name -->
+          <div class="mb-3">
+            <label>First Name</label>
+            <input v-model="client.firstName" required class="form-control" />
+          </div>
 
-        <!-- Last name -->
-        <div class="mb-3">
-          <label>Last Name</label>
-          <input v-model="client.lastName" required class="form-control" />
-        </div>
+          <!-- Last name -->
+          <div class="mb-3">
+            <label>Last Name</label>
+            <input v-model="client.lastName" required class="form-control" />
+          </div>
 
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <button type="submit" class="btn btn-success">Save</button>
-          <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
-          <button type="button" class="btn btn-warning" @click="archiveClient(false)" v-if="client.isArchived">UnArchive</button>
-          <button type="button" class="btn btn-secondary" @click="$router.push({ name: 'client-dashboard' })">Cancel</button>
-        </div>
-        <!-- </form> -->
+          <!-- Email -->
+          <div class="mb-3">
+            <label>Email</label>
+            <input v-model="client.email" required class="form-control" />
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="submit" class="btn btn-success" @click="saveClient">Save</button>
+            <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
+            <button type="button" class="btn btn-warning" @click="archiveClient(false)" v-if="client.isArchived">UnArchive</button>
+            <button type="button" class="btn btn-secondary" @click="$router.push({ name: 'client-dashboard' })">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
