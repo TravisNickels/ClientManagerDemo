@@ -17,7 +17,20 @@ const loadClient = async (): Promise<void> => {
   } catch (error) {
     console.error('Failed to load client', error)
     alert('Could not load client data')
-    router.push({ name: 'ClientDashboard' })
+    router.push({ name: 'client-dashboard' })
+  }
+}
+
+const archiveClient = async (archive: boolean): Promise<void> => {
+  if (!client.value) return
+  try {
+    if (archive) await clientStore.archiveClient(client.value.id)
+    else await clientStore.unArchiveClient(client.value.id)
+
+    router.push({ name: 'client-dashboard' })
+  } catch (error) {
+    console.error('Failed to change archive status', error)
+    alert('Could not change archive status of client')
   }
 }
 
@@ -44,6 +57,8 @@ onMounted(loadClient)
 
         <div class="d-flex justify-content-end gap-2 mt-4">
           <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
+          <button type="button" class="btn btn-warning" @click="archiveClient(false)" v-if="client.isArchived">UnArchive</button>
           <button type="button" class="btn btn-secondary" @click="$router.push({ name: 'client-dashboard' })">Cancel</button>
         </div>
         <!-- </form> -->

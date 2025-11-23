@@ -32,6 +32,14 @@ export const useClientStore = defineStore('clientStore', () => {
     return response.data
   }
 
+  const archiveClient = async (clientId: string): Promise<void> => {
+    await apiConnection.patch(`/api/client/archive/${clientId}`)
+  }
+
+  const unArchiveClient = async (clientId: string): Promise<void> => {
+    await apiConnection.patch(`/api/client/unarchive/${clientId}`)
+  }
+
   watch(showArchivedClients, updateClientsList)
 
   return {
@@ -40,6 +48,8 @@ export const useClientStore = defineStore('clientStore', () => {
     getActiveClients,
     updateClientsList,
     createClientRequest,
+    archiveClient,
+    unArchiveClient,
     getClient,
   }
 })
