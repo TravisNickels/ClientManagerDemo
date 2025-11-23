@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using ClientManager.Shared.Contracts.Commands;
+﻿using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.Contracts.Events;
 using ClientManager.Shared.Messaging;
 using ClientManager.Shared.Models;
@@ -22,7 +21,8 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
                 FirstName = message.FirstName,
                 LastName = message.LastName,
                 Email = message.Email,
-            }
+            },
+            cancellationToken
         );
 
         _logger.LogInformation("CreateClientHandler processed {id}", message.Id);
