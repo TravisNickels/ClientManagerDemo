@@ -22,4 +22,16 @@ public static class ClientMapper
             IsArchived = false
         };
     }
+
+    public static UpdateClient ToUpdateClientCommand(UpdateClientRequest request)
+    {
+        return new UpdateClient
+        {
+            Id = request.Id,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            IsArchived = request.IsArchived
+        };
+    }
 }
