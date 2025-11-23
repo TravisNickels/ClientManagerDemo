@@ -74,4 +74,12 @@ public class ClientController(IClientService clientService) : ControllerBase
 
         return Ok();
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateClient([FromBody] UpdateClientRequest updateClientRequest)
+    {
+        await _clientService.SendUpdateClientMessageAsync(ClientMapper.ToUpdateClientCommand(updateClientRequest));
+
+        return Ok();
+    }
 }
