@@ -6,6 +6,6 @@ export interface Client {
   isArchived: boolean
 }
 
-export type CreateClientRequest = Omit<Client, 'id'>
+export type CreateClientRequest = Omit<Client, 'id' | 'isArchived'>
 export type UpdateClientRequest = Client
 export type ClientResponse = Client
