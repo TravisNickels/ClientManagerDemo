@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import axios from 'axios'
-import type { Client, CreateClientRequest } from '@/types/client'
+import type { Client, CreateClientRequest, UpdateClientRequest } from '@/types/client'
 import { useSignalRStore } from '@/stores/signalrStore'
 import { SignalrEventNames } from '@/signalr/events'
 
@@ -40,6 +40,10 @@ export const useClientStore = defineStore('clientStore', () => {
     await apiConnection.patch(`/api/client/unarchive/${clientId}`)
   }
 
+  const updateClientRequest = async (updatedClient: UpdateClientRequest): Promise<void> => {
+    await apiConnection.put(`/api/client/${updatedClient.id}`, updatedClient)
+  }
+
   watch(showArchivedClients, updateClientsList)
 
   return {
@@ -50,6 +54,7 @@ export const useClientStore = defineStore('clientStore', () => {
     createClientRequest,
     archiveClient,
     unArchiveClient,
+    updateClientRequest,
     getClient,
   }
 })
