@@ -21,7 +21,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                     FirstName = "Luke",
                     LastName = "Skywalker",
                     Email = "Luke.Skywalker@gmail.com",
-                    IsArchived = false
+                    IsArchived = false,
                 },
                 new Client
                 {
@@ -48,5 +48,40 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                     IsArchived = true
                 }
             );
+
+        modelBuilder
+            .Entity<Phone>()
+            .HasData(
+                new Phone
+                {
+                    Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                    ClientId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                    Number = "111-111-1111",
+                    Type = "Home"
+                },
+                new Phone
+                {
+                    Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                    ClientId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                    Number = "222-222-2222",
+                    Type = "Home"
+                },
+                new Phone
+                {
+                    Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                    ClientId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                    Number = "333-333-3333",
+                    Type = "Home"
+                },
+                new Phone
+                {
+                    Id = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                    ClientId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                    Number = "444-444-4444",
+                    Type = "Home"
+                }
+            );
+
+        modelBuilder.Entity<Client>().HasMany(c => c.Phones).WithOne(p => p.Client).HasForeignKey(p => p.ClientId).OnDelete(DeleteBehavior.Cascade);
     }
 }
