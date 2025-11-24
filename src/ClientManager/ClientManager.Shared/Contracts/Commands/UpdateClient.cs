@@ -15,4 +15,6 @@ public class UpdateClient : ICommand
     public string Email { get; set; } = default!;
 
     public bool IsArchived { get; set; } = default!;
+
+    public List<UpdatePhone> Phones { get; set; } = [];
 }

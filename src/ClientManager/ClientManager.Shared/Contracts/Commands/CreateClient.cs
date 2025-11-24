@@ -18,4 +18,6 @@ public class CreateClient : ICommand
     public string Email { get; set; } = default!;
 
     public bool IsArchived { get; set; } = default!;
+
+    public List<CreatePhone> Phones { get; set; } = default!;
 }
