@@ -21,6 +21,17 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
                 FirstName = message.FirstName,
                 LastName = message.LastName,
                 Email = message.Email,
+                IsArchived = false,
+                Phones =
+                    message
+                        .Phones?.Select(phone => new Phone
+                        {
+                            Id = phone.Id == Guid.Empty ? Guid.NewGuid() : phone.Id,
+                            ClientId = phone.ClientId == Guid.Empty ? message.Id : phone.Id,
+                            Number = phone.PhoneNumber,
+                            Type = phone.PhoneType
+                        })
+                        .ToList() ?? []
             },
             cancellationToken
         );

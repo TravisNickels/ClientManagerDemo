@@ -21,7 +21,17 @@ public class UpdateClientHandler(IClientRepository clientRepository, IMessagePub
                 FirstName = message.FirstName,
                 LastName = message.LastName,
                 Email = message.Email,
-                IsArchived = message.IsArchived
+                IsArchived = message.IsArchived,
+                Phones =
+                    message
+                        .Phones?.Select(p => new Phone
+                        {
+                            Id = p.Id,
+                            ClientId = message.Id,
+                            Number = p.Number,
+                            Type = p.Type
+                        })
+                        .ToList() ?? []
             },
             cancellationToken
         );
