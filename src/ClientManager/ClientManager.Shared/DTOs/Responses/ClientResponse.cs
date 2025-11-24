@@ -1,3 +1,5 @@
-﻿namespace ClientManager.Shared.DTOs.Responses;
+﻿using ClientManager.Shared.Models;
 
-public record ClientResponse(Guid Id, string FirstName, string LastName, string Email, bool IsArchived);
+namespace ClientManager.Shared.DTOs.Responses;
+
+public record ClientResponse(Guid Id, string FirstName, string LastName, string Email, bool IsArchived, List<PhoneResponse> Phones);

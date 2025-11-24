@@ -32,9 +32,10 @@ internal class ClientControllerTests
             Id = Guid.Parse("7d33b8fc-c3b5-45bf-a0d2-d265ee873b91"),
             FirstName = clientRequest.FirstName,
             LastName = clientRequest.LastName,
-            Email = clientRequest.Email
+            Email = clientRequest.Email,
+            Phones = []
         };
-        clientResponse = new ClientResponse(Id: client.Id, FirstName: client.FirstName!, LastName: client.LastName!, Email: client.Email!, IsArchived: false);
+        clientResponse = new ClientResponse(Id: client.Id, FirstName: client.FirstName!, LastName: client.LastName!, Email: client.Email!, IsArchived: false, Phones: []);
     }
 
     [Test]
