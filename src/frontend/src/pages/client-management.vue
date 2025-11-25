@@ -26,7 +26,7 @@ const loadClient = async (): Promise<void> => {
 const deleteClient = async (): Promise<void> => {
   if (!client.value) return
   try {
-    await clientStore.deleteClientRequest(client.value.id)
+    await clientStore.sendDeleteClientRequest(client.value.id)
     router.push({ name: 'client-dashboard' })
   } catch (error) {
     console.error('Failed to delete client', error)
@@ -37,8 +37,8 @@ const deleteClient = async (): Promise<void> => {
 const archiveClient = async (archive: boolean): Promise<void> => {
   if (!client.value) return
   try {
-    if (archive) await clientStore.archiveClient(client.value.id)
-    else await clientStore.unArchiveClient(client.value.id)
+    if (archive) await clientStore.sendArchiveClientRequest(client.value.id)
+    else await clientStore.sendUnArchiveClientRequest(client.value.id)
 
     router.push({ name: 'client-dashboard' })
   } catch (error) {
@@ -61,7 +61,7 @@ const saveClient = async (): Promise<void> => {
 
   try {
     saving.value = true
-    await clientStore.updateClientRequest(updatedClient)
+    await clientStore.sendUpdateClientRequest(updatedClient)
     router.push({ name: 'client-dashboard' })
   } catch (error) {
     console.error('Failed to save client', error)

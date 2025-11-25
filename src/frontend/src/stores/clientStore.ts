@@ -32,7 +32,7 @@ export const useClientStore = defineStore('clientStore', () => {
     }
   }
 
-  const createClientRequest = async (newClient: CreateClientRequest): Promise<Client> => {
+  const sendCreateClientRequest = async (newClient: CreateClientRequest): Promise<Client> => {
     //TODO: TEMP delay (remove later)
     await new Promise((resolve) => setTimeout(resolve, 1500))
     const response: { data: Client } = await apiConnection.post<Client>('/api/client', newClient)
@@ -44,19 +44,20 @@ export const useClientStore = defineStore('clientStore', () => {
     return response.data
   }
 
-  const archiveClient = async (clientId: string): Promise<void> => {
+  const sendArchiveClientRequest = async (clientId: string): Promise<void> => {
     await apiConnection.patch(`/api/client/archive/${clientId}`)
   }
 
-  const unArchiveClient = async (clientId: string): Promise<void> => {
+  const sendUnArchiveClientRequest = async (clientId: string): Promise<void> => {
     await apiConnection.patch(`/api/client/unarchive/${clientId}`)
   }
 
-  const updateClientRequest = async (updatedClient: UpdateClientRequest): Promise<void> => {
+  const sendUpdateClientRequest = async (updatedClient: UpdateClientRequest): Promise<void> => {
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     await apiConnection.put(`/api/client/${updatedClient.id}`, updatedClient)
   }
 
-  const deleteClientRequest = async (clientId: string): Promise<void> => {
+  const sendDeleteClientRequest = async (clientId: string): Promise<void> => {
     await apiConnection.delete(`/api/client/${clientId}`)
   }
 
@@ -68,11 +69,11 @@ export const useClientStore = defineStore('clientStore', () => {
     getActiveClients,
     isLoading,
     updateClientsList,
-    createClientRequest,
-    archiveClient,
-    unArchiveClient,
-    updateClientRequest,
+    sendCreateClientRequest,
+    sendArchiveClientRequest,
+    sendUnArchiveClientRequest,
+    sendUpdateClientRequest,
     getClient,
-    deleteClientRequest,
+    sendDeleteClientRequest,
   }
 })
