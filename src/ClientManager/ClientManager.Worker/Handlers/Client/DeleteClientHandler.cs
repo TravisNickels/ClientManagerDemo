@@ -13,11 +13,16 @@ public class DeleteClientHandler(IClientRepository clientRepository, IMessagePub
 
     public async Task HandleAsync(DeleteClient message, MessageContext context, CancellationToken cancellationToken)
     {
-        await _clientRepository.DeleteAsync(message.Id, cancellationToken);
+        var client = await _clientRepository.DeleteAsync(message.Id, cancellationToken);
 
         _logger.LogInformation("Client {id} deleted", message.Id);
 
-        var deletedEvent = new ClientDeleted { Id = message.Id };
+        var deletedEvent = new ClientDeleted
+        {
+            Id = message.Id,
+            FirstName = client.FirstName,
+            LastName = client.LastName
+        };
 
         await _messagePublisher.PublishAsync(deletedEvent, cancellationToken);
     }
