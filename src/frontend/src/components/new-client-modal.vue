@@ -5,6 +5,7 @@ import { ref, type Ref } from 'vue'
 import { useClientStore } from '@/stores/clientStore'
 
 const clientStore = useClientStore()
+const saving = ref<boolean>(false)
 
 const emits = defineEmits<{
   (e: 'created', client: Client): void
@@ -33,6 +34,7 @@ const removePhone = (index: number): void => {
 }
 
 const submit = async (): Promise<void> => {
+  saving.value = true
   try {
     const client = await clientStore.createClientRequest(form.value)
     emits('created', client)
@@ -44,6 +46,8 @@ const submit = async (): Promise<void> => {
       console.error('Failed to create client', err)
     }
     alert('Could not create client')
+  } finally {
+    saving.value = false
   }
 }
 </script>
@@ -104,7 +108,11 @@ const submit = async (): Promise<void> => {
             <!-- Footer -->
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" @click="$emit('close')">Cancel</button>
-              <button type="submit" class="btn btn-primary">Create</button>
+              <button type="submit" class="btn btn-primary" :disabled="saving">
+                <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
+                <span v-if="!saving">Save</span>
+                <span v-else>Saving...</span>
+              </button>
             </div>
           </form>
         </div>
