@@ -12,6 +12,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Client>().HasMany(c => c.Phones).WithOne(p => p.Client).HasForeignKey(p => p.ClientId).OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder
             .Entity<Client>()
             .HasData(
@@ -81,7 +83,5 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
                     Type = "Home"
                 }
             );
-
-        modelBuilder.Entity<Client>().HasMany(c => c.Phones).WithOne(p => p.Client).HasForeignKey(p => p.ClientId).OnDelete(DeleteBehavior.Cascade);
     }
 }
