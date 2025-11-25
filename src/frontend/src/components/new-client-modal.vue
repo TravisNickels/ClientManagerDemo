@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Client, CreateClientRequest } from '@/types/client'
-import type { CreatePhoneRequest } from '@/types/phone'
-import { ref, type Ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useClientStore } from '@/stores/clientStore'
+import ClientForm from '@/components/client-form.vue'
 
 const clientStore = useClientStore()
 const saving = ref<boolean>(false)
@@ -12,7 +12,8 @@ const emits = defineEmits<{
   (e: 'close'): void
 }>()
 
-const form: Ref<CreateClientRequest> = ref({
+const form = reactive<Client>({
+  id: '',
   firstName: '',
   lastName: '',
   email: '',
@@ -20,23 +21,25 @@ const form: Ref<CreateClientRequest> = ref({
   phones: [],
 })
 
-const addingPhone = (): void => {
-  const newPhone: CreatePhoneRequest = {
-    phoneNumber: '',
-    phoneType: '',
+function createClientRequestFromForm(): CreateClientRequest {
+  return {
+    firstName: form.firstName,
+    lastName: form.lastName,
+    email: form.email,
+    isArchived: form.isArchived,
+    phones:
+      form.phones?.map((phone) => ({
+        phoneNumber: phone.phoneNumber,
+        phoneType: phone.phoneType,
+      })) || [],
   }
-  form.value.phones?.push(newPhone)
-}
-
-const removePhone = (index: number): void => {
-  if (form.value.phones === null) return
-  if (form.value.phones!.length > 0) form.value.phones!.splice(index, 1)
 }
 
 const submit = async (): Promise<void> => {
   saving.value = true
   try {
-    const client = await clientStore.createClientRequest(form.value)
+    const formRequest = createClientRequestFromForm()
+    const client = await clientStore.sendCreateClientRequest(formRequest)
     emits('created', client)
     emits('close')
   } catch (err: unknown) {
@@ -54,7 +57,7 @@ const submit = async (): Promise<void> => {
 
 <template>
   <div class="modal fade show d-block backdrop" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5)">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content shadow">
         <!-- Header -->
         <div class="modal-header">
@@ -64,57 +67,7 @@ const submit = async (): Promise<void> => {
 
         <!-- Body -->
         <div class="modal-body">
-          <form @submit.prevent="submit" class="needs-validation" novalidate>
-            <!-- First Name -->
-            <div class="mb-3">
-              <label class="form-label">First Name</label>
-              <input v-model="form.firstName" type="text" class="form-control" required />
-            </div>
-
-            <!-- Last Name -->
-            <div class="mb-3">
-              <label class="form-label">Last Name</label>
-              <input v-model="form.lastName" type="text" class="form-control" required />
-            </div>
-
-            <!-- email -->
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input v-model="form.email" type="text" class="form-control" required />
-            </div>
-
-            <!-- Phone numbers -->
-            <label class="form-label">Phone Numbers</label>
-            <div class="mb-3">
-              <div v-for="(phone, index) in form.phones" :key="index" class="border rounded p-2 mb-2 bg-light">
-                <div class="row g-2 align-items-center">
-                  <div class="col-md-6">
-                    <label class="form-label">Phone {{ index + 1 }}</label>
-                    <input v-model="phone.phoneNumber" placeholder="123-456-7890" class="form-control" />
-                  </div>
-                  <div class="col-md-5">
-                    <label class="form-label">Type</label>
-                    <input v-model="phone.phoneType" placeholder="mobile/work/home" class="form-control" />
-                  </div>
-                  <div class="col-md-1 text-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm" @click="removePhone(index)">&times;</button>
-                  </div>
-                </div>
-              </div>
-
-              <button type="button" class="btn btn-outline-primary btn-sm" @click="addingPhone">Add Phone</button>
-            </div>
-
-            <!-- Footer -->
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="$emit('close')">Cancel</button>
-              <button type="submit" class="btn btn-primary" :disabled="saving">
-                <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
-                <span v-if="!saving">Save</span>
-                <span v-else>Saving...</span>
-              </button>
-            </div>
-          </form>
+          <ClientForm :client="form" mode="create" :saving="saving" @submit="submit" @cancel="$emit('close')" />
         </div>
       </div>
     </div>
