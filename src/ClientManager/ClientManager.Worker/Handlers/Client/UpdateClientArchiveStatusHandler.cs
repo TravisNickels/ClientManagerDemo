@@ -5,7 +5,7 @@ using ClientManager.Worker.Repositories;
 
 namespace ClientManager.Worker.Handlers;
 
-public class ChangeClientArchiveStatusHandler(IClientRepository clientRepository, IMessagePublisher messagePublisher, ILogger<CreateClientHandler> logger)
+public class UpdateClientArchiveStatusHandler(IClientRepository clientRepository, IMessagePublisher messagePublisher, ILogger<CreateClientHandler> logger)
     : IHandleMessage<UpdateClientArchiveStatus>
 {
     readonly IClientRepository _clientRepository = clientRepository;
