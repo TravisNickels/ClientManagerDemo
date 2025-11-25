@@ -29,7 +29,7 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
 
     public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.Include(c => c.Phones).FirstOrDefaultAsync(c => c.Id == id);
 
-    public async Task SendChangeClientArchiveStatusMessageAsync(ChangeClientArchiveStatus message)
+    public async Task SendChangeClientArchiveStatusMessageAsync(UpdateClientArchiveStatus message)
     {
         try
         {
