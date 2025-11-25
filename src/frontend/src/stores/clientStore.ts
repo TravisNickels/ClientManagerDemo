@@ -9,6 +9,7 @@ export const useClientStore = defineStore('clientStore', () => {
   const apiConnection = axios.create({ baseURL: 'http://localhost:5200' })
   const signalR = useSignalRStore()
   const allClients = ref<Client[]>([])
+  const isLoading = ref<boolean>(false)
   const showArchivedClients = ref<boolean>(false)
   const getActiveClients = computed<Client[]>(() => allClients.value.filter((client) => !client.isArchived))
 
@@ -18,8 +19,17 @@ export const useClientStore = defineStore('clientStore', () => {
   })
 
   const updateClientsList = async (): Promise<void> => {
-    const response: { data: Client[] } = await apiConnection.get<Client[]>('/api/client')
-    allClients.value = response.data
+    try {
+      isLoading.value = true
+
+      //TODO: TEMP delay (remove later)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      const response: { data: Client[] } = await apiConnection.get<Client[]>('/api/client')
+      allClients.value = response.data
+    } finally {
+      isLoading.value = false
+    }
   }
 
   const createClientRequest = async (newClient: CreateClientRequest): Promise<Client> => {
@@ -50,6 +60,7 @@ export const useClientStore = defineStore('clientStore', () => {
     allClients,
     showArchivedClients,
     getActiveClients,
+    isLoading,
     updateClientsList,
     createClientRequest,
     archiveClient,

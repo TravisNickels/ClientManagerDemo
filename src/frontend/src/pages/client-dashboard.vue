@@ -33,6 +33,6 @@ onMounted(async () => {
       <button class="btn btn-primary mt-3" @click="showNewClientModal = true">Create New Client</button>
     </div>
     <NewClientModal v-if="showNewClientModal" @created="clientStore.updateClientsList" @close="showNewClientModal = false" />
-    <ClientList :clients="filteredClients" :show-archived-clients="false" />
+    <ClientList :clients="filteredClients" :loading="clientStore.isLoading" :show-archived-clients="false" @create="showNewClientModal = true" />
   </div>
 </template>
