@@ -82,4 +82,12 @@ public class ClientController(IClientService clientService) : ControllerBase
 
         return Ok();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteClient(Guid id)
+    {
+        await _clientService.SendDeleteClientMessageAsync(ClientMapper.ToDeleteClientCommand(id));
+
+        return Ok();
+    }
 }

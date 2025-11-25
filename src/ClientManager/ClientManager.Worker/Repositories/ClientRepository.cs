@@ -73,4 +73,13 @@ public class ClientRepository(AppDbContext appDbContext) : IClientRepository
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var client =
+            await _context.Clients.Include(c => c.Phones).FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+            ?? throw new InvalidOperationException($"Client with id {id} not found.");
+        _context.Clients.Remove(client);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

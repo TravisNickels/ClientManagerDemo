@@ -10,4 +10,5 @@ public interface IClientService
     IEnumerable<Client> GetAllClients();
     Task SendChangeClientArchiveStatusMessageAsync(ChangeClientArchiveStatus message);
     Task SendUpdateClientMessageAsync(UpdateClient message);
+    Task SendDeleteClientMessageAsync(DeleteClient message);
 }

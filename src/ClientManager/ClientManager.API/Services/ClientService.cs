@@ -52,4 +52,16 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
             throw;
         }
     }
+
+    public async Task SendDeleteClientMessageAsync(DeleteClient message)
+    {
+        try
+        {
+            await _messagePublisher.PublishAsync(message);
+        }
+        catch (PublishException)
+        {
+            throw;
+        }
+    }
 }

@@ -13,6 +13,8 @@ public static class ClientMapper
     public static ClientResponse ToResponse(CreateClient client) =>
         new(client.Id, client.FirstName!, client.LastName!, client.Email!, client.IsArchived!, client.Phones.ConvertAll(phone => phone.ToResponse()));
 
+    public static DeleteClient ToDeleteClientCommand(Guid id) => new() { Id = id };
+
     public static CreateClient ToCreateClientCommand(CreateClientRequest request)
     {
         return new CreateClient
