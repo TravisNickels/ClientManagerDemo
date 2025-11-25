@@ -62,7 +62,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [HttpPatch("archive/{id}")]
     public async Task<IActionResult> ArchiveClient(Guid id)
     {
-        await _clientService.SendChangeClientArchiveStatusMessageAsync(new ChangeClientArchiveStatus { Id = id, IsArchived = true });
+        await _clientService.SendChangeClientArchiveStatusMessageAsync(ClientMapper.ToUpdateClientArchiveStatusCommand(id, true));
 
         return Ok();
     }
@@ -70,7 +70,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [HttpPatch("unarchive/{id}")]
     public async Task<IActionResult> UnArchiveClient(Guid id)
     {
-        await _clientService.SendChangeClientArchiveStatusMessageAsync(new ChangeClientArchiveStatus { Id = id, IsArchived = false });
+        await _clientService.SendChangeClientArchiveStatusMessageAsync(ClientMapper.ToUpdateClientArchiveStatusCommand(id, false));
 
         return Ok();
     }

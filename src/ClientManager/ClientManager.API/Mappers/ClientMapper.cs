@@ -15,6 +15,8 @@ public static class ClientMapper
 
     public static DeleteClient ToDeleteClientCommand(Guid id) => new() { Id = id };
 
+    public static UpdateClientArchiveStatus ToUpdateClientArchiveStatusCommand(Guid id, bool isArchived) => new() { Id = id, IsArchived = isArchived };
+
     public static CreateClient ToCreateClientCommand(CreateClientRequest request)
     {
         return new CreateClient
