@@ -33,6 +33,8 @@ export const useClientStore = defineStore('clientStore', () => {
   }
 
   const createClientRequest = async (newClient: CreateClientRequest): Promise<Client> => {
+    //TODO: TEMP delay (remove later)
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     const response: { data: Client } = await apiConnection.post<Client>('/api/client', newClient)
     return response.data
   }
@@ -54,6 +56,10 @@ export const useClientStore = defineStore('clientStore', () => {
     await apiConnection.put(`/api/client/${updatedClient.id}`, updatedClient)
   }
 
+  const deleteClientRequest = async (clientId: string): Promise<void> => {
+    await apiConnection.delete(`/api/client/${clientId}`)
+  }
+
   watch(showArchivedClients, updateClientsList)
 
   return {
@@ -67,5 +73,6 @@ export const useClientStore = defineStore('clientStore', () => {
     unArchiveClient,
     updateClientRequest,
     getClient,
+    deleteClientRequest,
   }
 })

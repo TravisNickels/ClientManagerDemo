@@ -47,6 +47,17 @@ const removePhone = (index: number): void => {
   }
 }
 
+const deleteClient = async (): Promise<void> => {
+  if (!client.value) return
+  try {
+    await clientStore.deleteClientRequest(client.value.id)
+    router.push({ name: 'client-dashboard' })
+  } catch (error) {
+    console.error('Failed to delete client', error)
+    alert('Could not delete client')
+  }
+}
+
 const archiveClient = async (archive: boolean): Promise<void> => {
   if (!client.value) return
   try {
@@ -133,11 +144,11 @@ onMounted(loadClient)
             </div>
           </div>
 
-          <div class="d-flex justify-content-end gap-2 mt-4">
-            <button type="submit" class="btn btn-success">Save</button>
-            <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
-            <button type="button" class="btn btn-warning" @click="archiveClient(false)" v-if="client.isArchived">UnArchive</button>
-            <button type="button" class="btn btn-secondary" @click="$router.push({ name: 'client-dashboard' })">Cancel</button>
+          <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-start gap-2 mt-4">
+              <button type="button" class="btn btn-danger" @click="deleteClient">Delete</button>
+            </div>
+
             <div class="d-flex justify-content-end gap-2 mt-4">
               <button type="submit" class="btn btn-success">Save</button>
               <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
