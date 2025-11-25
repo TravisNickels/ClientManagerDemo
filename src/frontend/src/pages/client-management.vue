@@ -138,6 +138,12 @@ onMounted(loadClient)
             <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
             <button type="button" class="btn btn-warning" @click="archiveClient(false)" v-if="client.isArchived">UnArchive</button>
             <button type="button" class="btn btn-secondary" @click="$router.push({ name: 'client-dashboard' })">Cancel</button>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="submit" class="btn btn-success">Save</button>
+              <button type="button" class="btn btn-warning" @click="archiveClient(true)" v-if="!client.isArchived">Archive</button>
+              <button type="button" class="btn btn-warning" @click="archiveClient(false)" v-if="client.isArchived">UnArchive</button>
+              <button type="button" class="btn btn-secondary" @click="$router.push({ name: 'client-dashboard' })">Cancel</button>
+            </div>
           </div>
         </form>
       </div>

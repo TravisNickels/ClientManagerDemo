@@ -18,6 +18,16 @@ const props = defineProps<{
       <span class="placeholder col-2 rounded-pill"></span>
     </li>
   </ul>
+  <!-- Empty State -->
+  <div v-else-if="props.clients.length === 0" class="text-center py-5 border rounded bg-lig">
+    <h4 class="mb-2">
+      {{ props.showArchivedClients ? 'No archived clients' : 'No clients yet' }}
+    </h4>
+    <p class="text-muted mb-3">
+      {{ props.showArchivedClients ? 'Active clients will appear here when archived.' : 'Create your first client to get started.' }}
+    </p>
+    <button class="btn btn-primary" @click="$emit('create')">Create Client</button>
+  </div>
   <!-- Client List -->
   <ul v-else class="list-group">
     <li v-for="client in props.clients" :key="client.id" class="list-group-item d-flex justify-content-between align-items-center">
