@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useSignalRStore } from './stores/signalrStore'
+import { useSignalRStore } from './stores/signalr-store'
 
 const signalRStore = useSignalRStore()
 

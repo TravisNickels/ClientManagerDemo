@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import axios from 'axios'
 import type { Client, CreateClientRequest, UpdateClientRequest } from '@/types/client'
-import { useSignalRStore } from '@/stores/signalrStore'
+import { useSignalRStore } from '@/stores/signalr-store'
 import { SignalrEventNames } from '@/signalr/events'
 
 export const useClientStore = defineStore('clientStore', () => {
