@@ -5,6 +5,7 @@ import type { UpdateClientRequest as Client, UpdateClientRequest } from '@/types
 import { useClientStore } from '@/stores/clientStore'
 import ClientForm from '@/components/client-form.vue'
 import { toast } from 'vue3-toastify'
+import { confirm } from '@/composables/useConfirm'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,6 +27,7 @@ const loadClient = async (): Promise<void> => {
 
 const deleteClient = async (): Promise<void> => {
   if (!client.value) return
+  if (!(await confirmDelete())) return
   try {
     await clientStore.sendDeleteClientRequest(client.value.id)
     router.push({ name: 'client-dashboard' })
@@ -37,6 +39,7 @@ const deleteClient = async (): Promise<void> => {
 
 const archiveClient = async (archive: boolean): Promise<void> => {
   if (!client.value) return
+  if (archive) if (!(await confirmArchive())) return
   try {
     if (archive) await clientStore.sendArchiveClientRequest(client.value.id)
     else await clientStore.sendUnArchiveClientRequest(client.value.id)
@@ -46,6 +49,24 @@ const archiveClient = async (archive: boolean): Promise<void> => {
     console.error('Failed to change archive status', error)
     alert('Could not change archive status of client')
   }
+}
+
+async function confirmDelete() {
+  return await confirm({
+    title: 'Delete Client',
+    message: 'Are you sure you want to delete this client?',
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+  })
+}
+
+async function confirmArchive() {
+  return await confirm({
+    title: 'Archive Client',
+    message: 'Are you sure you want to archive this client?',
+    confirmText: 'Archive',
+    cancelText: 'Cancel',
+  })
 }
 
 const saveClient = async (): Promise<void> => {

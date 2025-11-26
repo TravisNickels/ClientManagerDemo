@@ -1,11 +1,14 @@
 import * as signalR from '@microsoft/signalr'
 import { type SignalrEvents } from '@/signalr/events'
+import { ref } from 'vue'
 
 type Handler<K extends keyof SignalrEvents> = (payload: SignalrEvents[K]) => void
+export type ConnectionState = 'connected' | 'connecting' | 'reconnecting' | 'disconnected'
 
 export class SignalRClient {
   private connection: signalR.HubConnection | null = null
   private listeners: { [K in keyof SignalrEvents]?: Handler<K>[] } = {}
+  private foo = ref<ConnectionState>('disconnected')
 
   constructor(private readonly url: string = 'http://localhost:5200/notifications') {}
 
@@ -21,6 +24,10 @@ export class SignalRClient {
     this.connection.onreconnected(() => {
       console.log('[SignalR] Reconnected — restoring event handlers.')
       this.registerListeners()
+    })
+
+    this.connection.onclose(async (error) => {
+      console.warn('[SignalR] connection closed', error)
     })
 
     try {

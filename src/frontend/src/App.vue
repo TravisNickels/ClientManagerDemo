@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useSignalRStore } from './stores/signalr-store'
+import ConfirmationModal from './components/confirmation-modal.vue'
 
 const signalRStore = useSignalRStore()
 
@@ -17,6 +18,7 @@ onMounted(async () => {
       <router-link to="/client-dashboard">Dashboard</router-link>
     </div>
     <RouterView />
+    <ConfirmationModal />
   </div>
 </template>
 
