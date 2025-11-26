@@ -3,6 +3,7 @@ import type { Client, CreateClientRequest } from '@/types/client'
 import { reactive, ref } from 'vue'
 import { useClientStore } from '@/stores/clientStore'
 import ClientForm from '@/components/client-form.vue'
+import { toast } from 'vue3-toastify'
 
 const clientStore = useClientStore()
 const saving = ref<boolean>(false)
@@ -39,7 +40,11 @@ const submit = async (): Promise<void> => {
   saving.value = true
   try {
     const formRequest = createClientRequestFromForm()
-    const client = await clientStore.sendCreateClientRequest(formRequest)
+    const client = await toast.promise(clientStore.sendCreateClientRequest(formRequest), {
+      pending: { render: 'Send create client request...' },
+      success: { render: 'Create client request sent!', autoClose: 2000, position: 'top-right' },
+      error: { render: 'Failed to send create client request' },
+    })
     emits('created', client)
     emits('close')
   } catch (err: unknown) {

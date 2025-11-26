@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import axios from 'axios'
-import type { Client, CreateClientRequest, UpdateClientRequest } from '@/types/client'
+import type { Client, CreateClientRequest, UpdateClientRequest, ClientResponse } from '@/types/client'
 import { useSignalRStore } from '@/stores/signalr-store'
 import { SignalrEventNames } from '@/signalr/events'
+import { toast } from 'vue3-toastify'
 
 export const useClientStore = defineStore('clientStore', () => {
   const apiConnection = axios.create({ baseURL: 'http://localhost:5200' })
@@ -13,7 +14,8 @@ export const useClientStore = defineStore('clientStore', () => {
   const showArchivedClients = ref<boolean>(false)
   const getActiveClients = computed<Client[]>(() => allClients.value.filter((client) => !client.isArchived))
 
-  signalR.on(SignalrEventNames.ClientResponse, async () => {
+  signalR.on(SignalrEventNames.ClientResponse, async (response: ClientResponse) => {
+    toast.info(`${response.firstName} ${response.lastName} updated [SignalR] `)
     console.log('[SignalR] Client update event received — refreshing client list.')
     await updateClientsList()
   })

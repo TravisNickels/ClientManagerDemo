@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { UpdateClientRequest as Client, UpdateClientRequest } from '@/types/client'
 import { useClientStore } from '@/stores/clientStore'
 import ClientForm from '@/components/client-form.vue'
+import { toast } from 'vue3-toastify'
 
 const route = useRoute()
 const router = useRouter()
@@ -61,11 +62,22 @@ const saveClient = async (): Promise<void> => {
 
   try {
     saving.value = true
-    await clientStore.sendUpdateClientRequest(updatedClient)
+
+    await toast.promise(
+      clientStore.sendUpdateClientRequest(updatedClient),
+      {
+        pending: { render: 'Sending client update request...' },
+        success: { render: 'Client update request sent!' },
+        error: { render: 'Failed to send client update request' },
+      },
+      {
+        position: 'bottom-right',
+      }
+    )
     router.push({ name: 'client-dashboard' })
   } catch (error) {
     console.error('Failed to save client', error)
-    alert('Could not save client data')
+    toast.error('Could not save client data')
   } finally {
     saving.value = false
   }
