@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import axios from 'axios'
 import type { Client, CreateClientRequest, UpdateClientRequest, ClientResponse } from '@/types/client'
 import { useSignalRStore } from '@/stores/signalr-store'
-import { SignalrEventNames } from '@/signalr/events'
+import { SignalrEventNames } from '@/types/signalr/signalrEvents'
 import { toast } from 'vue3-toastify'
 
 export const useClientStore = defineStore('clientStore', () => {
