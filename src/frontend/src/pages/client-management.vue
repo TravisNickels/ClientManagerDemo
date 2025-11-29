@@ -78,7 +78,14 @@ const saveClient = async (): Promise<void> => {
     lastName: client.value.lastName,
     email: client.value.email,
     isArchived: client.value.isArchived,
-    phones: client.value.phones || [],
+    phones: client.value.phones?.map((p) => {
+      return {
+        id: !p.id ? undefined : p.id,
+        clientId: client.value!.id,
+        phoneNumber: p.phoneNumber,
+        phoneType: p.phoneType,
+      }
+    }),
   }
 
   try {
