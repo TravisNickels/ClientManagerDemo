@@ -1,6 +1,3 @@
-import ClientDashboard from '@/pages/client-dashboard.vue'
-import ClientHome from '@/pages/client-home.vue'
-import ClientManagement from '@/pages/client-management.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -8,19 +5,20 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'client-home',
-      component: ClientHome,
+      redirect: '/client-dashboard',
     },
     {
       path: '/client-dashboard',
       name: 'client-dashboard',
-      component: ClientDashboard,
+      component: () => import('@/pages/client-dashboard.vue'),
+      meta: { title: 'Clients' },
     },
     {
       path: '/client/:id',
       name: 'client-management',
-      component: ClientManagement,
+      component: () => import('@/pages/client-management.vue'),
       props: true,
+      meta: { title: 'Edit Client' },
     },
   ],
 })

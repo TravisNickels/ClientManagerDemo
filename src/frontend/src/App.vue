@@ -13,11 +13,6 @@ onMounted(async () => {
 
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link>
-      |
-      <router-link to="/client-dashboard">Dashboard</router-link>
-    </div>
     <header class="p-3 border-bottom d-flex justify-content-between">
       <div>Client Management Demo</div>
       <div><SignalRBadge /></div>
