@@ -5,5 +5,5 @@ export interface Phone {
   phoneType: string
 }
 
-export type CreatePhoneRequest = Omit<Phone, 'id' | 'clientId'>
+export type CreatePhoneRequest = Omit<Phone, 'id' | 'clientId'> & { clientId?: string }
 export type UpdatePhoneRequest = Phone

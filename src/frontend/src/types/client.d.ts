@@ -17,5 +17,5 @@ export interface CreateClientRequest {
   phones?: CreatePhoneRequest[]
 }
 
-export type UpdateClientRequest = Client
+export type UpdateClientRequest = Omit<Client, 'phones'> & { phones?: (CreatePhoneRequest | UpdatePhoneRequest)[] }
 export type ClientResponse = Client
