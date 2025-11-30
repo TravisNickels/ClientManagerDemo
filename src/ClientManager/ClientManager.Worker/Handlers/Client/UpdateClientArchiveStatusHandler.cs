@@ -16,9 +16,17 @@ public class UpdateClientArchiveStatusHandler(IClientRepository clientRepository
     {
         await _clientRepository.UpdateArchiveStatus(message.Id, message.IsArchived, cancellationToken);
 
+        var client = await _clientRepository.GetByIdAsync(message.Id);
+
         _logger.LogInformation("Client with ID {ClientId} archive status changed to {IsArchived}", message.Id, message.IsArchived);
 
-        var archiveStatusChangedEvent = new ClientArchiveStatusChanged { Id = message.Id, IsArchived = message.IsArchived };
+        var archiveStatusChangedEvent = new ClientArchiveStatusChanged
+        {
+            Id = message.Id,
+            FirstName = client?.FirstName ?? "",
+            LastName = client?.LastName ?? "",
+            IsArchived = message.IsArchived
+        };
 
         await _messagePublisher.PublishAsync(archiveStatusChangedEvent, cancellationToken);
     }
