@@ -32,9 +32,9 @@ public class MessagePublisher(
 
             _logger?.LogInformation("Successfully published message {MessageType}", typeof(T).Name);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger?.LogError(ex, "Error publishing message {MessageType}", typeof(T).Name);
+            _logger?.LogError("Error publishing message {MessageType}", typeof(T).Name);
             throw;
         }
         finally
