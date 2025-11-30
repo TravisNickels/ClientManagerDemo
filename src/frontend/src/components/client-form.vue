@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Client } from '@/types/client'
 import type { Phone } from '@/types/phone'
+import { vMaska } from 'maska/vue'
 import { computed, reactive, ref, watch } from 'vue'
 
 const props = defineProps<{
@@ -144,8 +145,9 @@ const attemptSubmit = (): void => {
           <div class="col-md-6">
             <label class="form-label">Phone {{ index + 1 }}</label>
             <input
+              v-maska="'+# (###) ###-####'"
               v-model="phone.phoneNumber"
-              placeholder="123-456-7890"
+              placeholder="+1 (123) 456-7890"
               @input="validate"
               class="form-control"
               :class="{ 'is-invalid': phoneErrors[index]?.phoneNumber }"

@@ -21,6 +21,7 @@
     "@microsoft/signalr": "^9.0.6",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
+    "maska": "^3.2.0",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
     "vue-router": "^4.5.1",
