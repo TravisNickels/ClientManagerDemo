@@ -1,4 +1,5 @@
-﻿using ClientManager.API.Mappers;
+﻿using System.ComponentModel.DataAnnotations;
+using ClientManager.API.Mappers;
 using ClientManager.API.Services;
 using ClientManager.Shared.Contracts.Commands;
 using ClientManager.Shared.DTOs.Requests;
@@ -38,13 +39,16 @@ public class ClientController(IClientService clientService) : ControllerBase
             };
             return StatusCode(500, errorResponse);
         }
+        catch (ValidationException ex)
+        {
+            return UnprocessableEntity(new { errors = ex.Message });
+        }
     }
 
     [HttpGet]
     public ActionResult<IEnumerable<ClientResponse>> GetClients()
     {
         var clients = _clientService.GetAllClients()?.Select(ClientMapper.ToResponse).ToList();
-
         return Ok(clients);
     }
 
@@ -63,7 +67,6 @@ public class ClientController(IClientService clientService) : ControllerBase
     public async Task<IActionResult> ArchiveClient(Guid id)
     {
         await _clientService.SendChangeClientArchiveStatusMessageAsync(ClientMapper.ToUpdateClientArchiveStatusCommand(id, true));
-
         return Ok();
     }
 
@@ -71,23 +74,27 @@ public class ClientController(IClientService clientService) : ControllerBase
     public async Task<IActionResult> UnArchiveClient(Guid id)
     {
         await _clientService.SendChangeClientArchiveStatusMessageAsync(ClientMapper.ToUpdateClientArchiveStatusCommand(id, false));
-
         return Ok();
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateClient([FromBody] UpdateClientRequest updateClientRequest)
     {
-        await _clientService.SendUpdateClientMessageAsync(ClientMapper.ToUpdateClientCommand(updateClientRequest));
-
-        return Ok();
+        try
+        {
+            await _clientService.SendUpdateClientMessageAsync(ClientMapper.ToUpdateClientCommand(updateClientRequest));
+            return Ok();
+        }
+        catch (ValidationException ex)
+        {
+            return UnprocessableEntity(new { errors = ex.Message });
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteClient(Guid id)
     {
         await _clientService.SendDeleteClientMessageAsync(ClientMapper.ToDeleteClientCommand(id));
-
         return Ok();
     }
 }
