@@ -53,7 +53,7 @@ const submit = async (): Promise<void> => {
     } else {
       console.error('Failed to create client', err)
     }
-    alert('Could not create client')
+    toast.error('Could not create client')
   } finally {
     saving.value = false
   }

@@ -20,7 +20,7 @@ const loadClient = async (): Promise<void> => {
     client.value = await clientStore.getClient(clientId)
   } catch (error) {
     console.error('Failed to load client', error)
-    alert('Could not load client data')
+    toast.error('Could not load client data')
     router.push({ name: 'client-dashboard' })
   }
 }
@@ -33,7 +33,7 @@ const deleteClient = async (): Promise<void> => {
     router.push({ name: 'client-dashboard' })
   } catch (error) {
     console.error('Failed to delete client', error)
-    alert('Could not delete client')
+    toast.error('Could not delete client')
   }
 }
 
@@ -47,7 +47,7 @@ const archiveClient = async (archive: boolean): Promise<void> => {
     router.push({ name: 'client-dashboard' })
   } catch (error) {
     console.error('Failed to change archive status', error)
-    alert('Could not change archive status of client')
+    toast.error('Could not change archive status of client')
   }
 }
 
