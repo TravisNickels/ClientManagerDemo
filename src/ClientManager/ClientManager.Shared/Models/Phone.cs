@@ -13,7 +13,7 @@ public class Phone
     public Guid ClientId { get; set; }
 
     [Required]
-    [Phone]
+    [RegularExpression(@"^\+\d \(\d{3}\) \d{3}-\d{4}$", ErrorMessage = "Phone number must match +# (###) ###-####")]
     public string Number { get; set; } = string.Empty;
 
     [Required]

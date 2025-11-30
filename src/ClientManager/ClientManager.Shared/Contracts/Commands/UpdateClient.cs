@@ -8,9 +8,13 @@ public class UpdateClient : ICommand
     [Required(ErrorMessage = "Client ID required to update client.")]
     public Guid Id { get; set; }
 
+    [Required(ErrorMessage = "Client must have a first name.")]
     public string FirstName { get; set; } = default!;
+
+    [Required(ErrorMessage = "Client must have a last name.")]
     public string LastName { get; set; } = default!;
 
+    [Required(ErrorMessage = "Client email address required")]
     [EmailAddress(ErrorMessage = "Client must have a valid email address.")]
     public string Email { get; set; } = default!;
 

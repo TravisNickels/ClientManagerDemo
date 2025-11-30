@@ -11,6 +11,7 @@ public class CreatePhone : ICommand
     public Guid ClientId { get; set; }
 
     [Required(ErrorMessage = "A phone must have a number")]
+    [RegularExpression(@"^\+\d \(\d{3}\) \d{3}-\d{4}$", ErrorMessage = "Phone number must match +# (###) ###-####")]
     public string PhoneNumber { get; set; } = default!;
 
     [Required(ErrorMessage = "A phone must have a type")]
