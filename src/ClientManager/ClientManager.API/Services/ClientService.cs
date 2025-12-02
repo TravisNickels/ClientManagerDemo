@@ -25,7 +25,7 @@ public class ClientService(IMessagePublisher publisher, ReadOnlyAppDbContext rea
         }
     }
 
-    public IEnumerable<Client> GetAllClients() => _readOnlyAppDbContext.Clients;
+    public IEnumerable<Client> GetAllClients() => _readOnlyAppDbContext.Clients.Include(c => c.Phones);
 
     public async Task<Client?> GetClientByIdAsync(Guid id) => await _readOnlyAppDbContext.Clients.Include(c => c.Phones).FirstOrDefaultAsync(c => c.Id == id);
 
