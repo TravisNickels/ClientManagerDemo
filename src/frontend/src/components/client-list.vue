@@ -30,11 +30,6 @@ const emit = defineEmits<{
     </p>
     <button v-if="!showArchivedClients" class="btn btn-primary px-4" @click="emit('create')">Create Client</button>
   </div>
-  <!-- <div v-else-if="props.clients.length === 0" class="empty-state">
-    <div class="emoji">👤</div>
-    <h3>No clients found</h3>
-    <p>Create your first client to get started.</p>
-  </div> -->
 
   <!-- Rows -->
   <div v-else class="list-wrapper">

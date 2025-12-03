@@ -65,9 +65,6 @@ const emit = defineEmits<{
             <button v-if="client.isArchived" class="btn btn-sm btn-outline-success flex-grow-1" @click.stop="emit('archive', client, false)">
               Activate
             </button>
-            <!-- <button v-if="!client.isArchived" class="btn btn-sm btn-outline-warning flex-grow-1" @click.stop="emit('archive', client, true)">
-              Archive
-            </button> -->
             <button class="btn btn-sm btn-outline-danger flex-grow-1" @click.stop="emit('delete', client)">Delete</button>
           </div>
         </div>
