@@ -21,7 +21,7 @@ const loadClient = async (): Promise<void> => {
   } catch (error) {
     console.error('Failed to load client', error)
     toast.error('Could not load client data')
-    router.push({ name: 'client-dashboard' })
+    goHome()
   }
 }
 
@@ -30,7 +30,7 @@ const deleteClient = async (): Promise<void> => {
   if (!(await confirmDelete())) return
   try {
     await clientStore.sendDeleteClientRequest(client.value.id)
-    router.push({ name: 'client-dashboard' })
+    goHome()
   } catch (error) {
     console.error('Failed to delete client', error)
     toast.error('Could not delete client')
@@ -41,10 +41,8 @@ const archiveClient = async (archive: boolean): Promise<void> => {
   if (!client.value) return
   if (archive) if (!(await confirmArchive())) return
   try {
-    if (archive) await clientStore.sendArchiveClientRequest(client.value.id)
-    else await clientStore.sendUnArchiveClientRequest(client.value.id)
-
-    router.push({ name: 'client-dashboard' })
+    await clientStore.toggleArchiveClient(client.value.id, archive)
+    goHome()
   } catch (error) {
     console.error('Failed to change archive status', error)
     toast.error('Could not change archive status of client')
@@ -102,7 +100,7 @@ const saveClient = async (): Promise<void> => {
         position: 'bottom-right',
       }
     )
-    router.push({ name: 'client-dashboard' })
+    goHome()
   } catch (error) {
     console.error('Failed to save client', error)
     toast.error('Could not save client data')
@@ -111,11 +109,24 @@ const saveClient = async (): Promise<void> => {
   }
 }
 
+function goHome() {
+  router.push({ name: 'clients-dashboard' })
+}
+
 onMounted(loadClient)
 </script>
 
 <template>
-  <div v-if="client" class="container my-4">
+  <div v-if="client" class="container-lg my-4">
+    <!-- <Breadcrumbs /> -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <router-link class="text-decoration-none" :to="{ name: 'client-dashboard' }">Clients </router-link>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ client.firstName }} {{ client.lastName }}</li>
+      </ol>
+    </nav>
     <div class="card shadow-sm">
       <div class="card-body">
         <h2 class="card-title mb-4">Edit Client</h2>
