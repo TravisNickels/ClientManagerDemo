@@ -25,7 +25,7 @@ export const useClientStore = defineStore('clientStore', () => {
       isLoading.value = true
 
       //TODO: TEMP delay (remove later)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // await new Promise((resolve) => setTimeout(resolve, 1000))
 
       const response: { data: Client[] } = await apiConnection.get<Client[]>('/api/client')
       allClients.value = response.data
@@ -36,7 +36,8 @@ export const useClientStore = defineStore('clientStore', () => {
 
   const sendCreateClientRequest = async (newClient: CreateClientRequest): Promise<Client> => {
     //TODO: TEMP delay (remove later)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    // await new Promise((resolve) => setTimeout(resolve, 1500))
+
     const response: { data: Client } = await apiConnection.post<Client>('/api/client', newClient)
     return response.data
   }
@@ -44,6 +45,10 @@ export const useClientStore = defineStore('clientStore', () => {
   const getClient = async (clientId: string): Promise<Client> => {
     const response: { data: Client } = await apiConnection.get<Client>(`/api/client/${clientId}`)
     return response.data
+  }
+
+  const toggleArchiveClient = async (id: string, archive: boolean): Promise<void> => {
+    return archive ? await sendArchiveClientRequest(id) : await sendUnArchiveClientRequest(id)
   }
 
   const sendArchiveClientRequest = async (clientId: string): Promise<void> => {
@@ -72,6 +77,7 @@ export const useClientStore = defineStore('clientStore', () => {
     isLoading,
     updateClientsList,
     sendCreateClientRequest,
+    toggleArchiveClient,
     sendArchiveClientRequest,
     sendUnArchiveClientRequest,
     sendUpdateClientRequest,
