@@ -17,6 +17,14 @@ const emits = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const phoneTypeOptions = [
+  { value: 'Home', label: 'Home' },
+  { value: 'Mobile', label: 'Mobile' },
+  { value: 'School', label: 'School' },
+  { value: 'Work', label: 'Work' },
+] as const
+const getPhoneTypeLabel = (value: string) => phoneTypeOptions.find((o) => o.value === value)?.label ?? 'Select Type'
+
 const touched = ref<boolean>(false)
 const formIsValid = ref<boolean>(false)
 const form = props.client
@@ -142,7 +150,7 @@ const attemptSubmit = (): void => {
     <div class="mb-3">
       <div v-for="(phone, index) in form.phones" :key="index" class="border rounded p-2 mb-2 bg-light">
         <div class="row g-2 align-items-center">
-          <div class="col-md-6">
+          <div class="col-md-8">
             <label class="form-label">Phone {{ index + 1 }}</label>
             <input
               v-maska="'+# (###) ###-####'"
@@ -154,15 +162,38 @@ const attemptSubmit = (): void => {
             />
             <div class="invalid-feedback">{{ phoneErrors[index]?.phoneNumber }}</div>
           </div>
-          <div class="col-md-5">
+          <div class="col-md-3">
             <label class="form-label">Type</label>
-            <input
-              v-model="phone.phoneType"
-              placeholder="mobile/work/home"
-              @input="validate"
-              class="form-control"
-              :class="{ 'is-invalid': phoneErrors[index]?.phoneType }"
-            />
+            <div class="dropdown" :class="{ 'is-invalid': phoneErrors[index]?.phoneType }">
+              <button
+                class="btn btn-outline-secondary dropdown-toggle form-control"
+                :class="{ 'is-invalid': phoneErrors[index]?.phoneType }"
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                {{ getPhoneTypeLabel(phone.phoneType) }}
+              </button>
+              <ul class="dropdown-menu">
+                <li v-for="option in phoneTypeOptions" :key="option.value">
+                  <button
+                    type="button"
+                    class="dropdown-item d-flex justify-content-between"
+                    :class="{ active: option.value === phone.phoneType }"
+                    @click="phone.phoneType = option.value"
+                  >
+                    {{ option.label }}
+                    <i v-if="option.value === phone.phoneType" class="bi bi-check"></i>
+                  </button>
+                </li>
+              </ul>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <button type="button" class="dropdown-item d-flex justify-content-between"></button>
+                <li>Work</li>
+                <li>Mobile</li>
+                <li>Home</li>
+                <li>School</li>
+              </ul>
+            </div>
             <div class="invalid-feedback">{{ phoneErrors[index]?.phoneType }}</div>
           </div>
           <div class="col-md-1 text-end">
@@ -182,7 +213,7 @@ const attemptSubmit = (): void => {
       <div class="d-flex justify-content-end gap-2 mt-4">
         <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Cancel</button>
         <button type="button" class="btn btn-warning" @click="$emit('archive', true)" v-if="!client.isArchived && mode === 'edit'">Archive</button>
-        <button type="button" class="btn btn-warning" @click="$emit('archive', false)" v-if="client.isArchived && mode === 'edit'">UnArchive</button>
+        <button type="button" class="btn btn-success" @click="$emit('archive', false)" v-if="client.isArchived && mode === 'edit'">Activate</button>
         <button type="submit" class="btn btn-primary" :disabled="saving">
           <span v-if="saving" class="spinner-border spinner-border-sm me-2"></span>
           {{ saving ? 'Saving...' : mode === 'create' ? 'Save' : 'Update' }}
