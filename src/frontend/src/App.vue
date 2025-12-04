@@ -13,8 +13,8 @@ onMounted(async () => {
 
 <template>
   <div id="app">
-    <header class="p-3 border-bottom d-flex justify-content-between">
-      <div>Client Management Demo</div>
+    <header aria-label="heading" class="p-3 border-bottom d-flex justify-content-between">
+      <div aria-label="Title">Client Management Demo</div>
       <div><SignalRBadge /></div>
     </header>
     <RouterView />
