@@ -89,11 +89,11 @@ onMounted(async () => {
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h1>Clients</h1>
       <div class="btn-group">
-        <button class="btn btn-outline-secondary" :class="{ active: showGrid }" @click="showGrid = true">
+        <button class="btn btn-outline-secondary" :class="{ active: !showGrid }" @click="showGrid = false" aria-label="list-view">
           <i class="bi bi-list"></i>
         </button>
 
-        <button class="btn btn-outline-secondary" :class="{ active: !showGrid }" @click="showGrid = false">
+        <button class="btn btn-outline-secondary" :class="{ active: showGrid }" @click="showGrid = true" aria-label="grid-view">
           <i class="bi bi-grid-3x3-gap-fill"></i>
         </button>
       </div>
@@ -101,7 +101,7 @@ onMounted(async () => {
     <ClientHeader :clients="clientStore.allClients" @update="updateVisibleClients" @create="showNewClientModal = true"></ClientHeader>
     <NewClientModal v-if="showNewClientModal" @created="clientStore.updateClientsList" @close="showNewClientModal = false" />
     <ClientList
-      v-if="showGrid"
+      v-if="!showGrid"
       :clients="visibleClients"
       :loading="clientStore.isLoading"
       :show-archived-clients="showArchive"
@@ -111,7 +111,7 @@ onMounted(async () => {
       @delete="deleteClient"
     />
     <Cards
-      v-if="!showGrid"
+      v-if="showGrid"
       :clients="visibleClients"
       :loading="clientStore.isLoading"
       :show-archived-clients="showArchive"
