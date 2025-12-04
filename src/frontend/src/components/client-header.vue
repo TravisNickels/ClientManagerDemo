@@ -73,17 +73,13 @@ watch(sortOption, () => {
   localStorage.setItem('sortOption', sortOption.value)
 })
 
-watch(
-  sorted,
-  (value) => {
-    localStorage.setItem('filterOption', filterOption.value)
-    localStorage.setItem('sortOption', sortOption.value)
-    localStorage.setItem('searchQuery', searchQuery.value)
-    const showingArchive = filterOption.value === 'archived'
-    emit('update', value, showingArchive)
-  },
-  { immediate: true }
-)
+watch(sorted, (value) => {
+  localStorage.setItem('filterOption', filterOption.value)
+  localStorage.setItem('sortOption', sortOption.value)
+  localStorage.setItem('searchQuery', searchQuery.value)
+  const showingArchive = filterOption.value === 'archived'
+  emit('update', value, showingArchive)
+})
 </script>
 
 <template>
@@ -102,6 +98,7 @@ watch(
             type="button"
             class="dropdown-item d-flex justify-content-between"
             :class="{ active: option.value === filterOption }"
+            :aria-label="'option-' + option.value"
             @click="filterOption = option.value"
           >
             {{ option.label }}
