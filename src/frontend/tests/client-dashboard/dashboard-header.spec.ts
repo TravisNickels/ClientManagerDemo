@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { renderWithApp } from '../utilities/render'
-import Header from '@/components/client-header.vue'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { clickFilterDropdownOption } from './action/clickFilterDropdownOption'
 import type { Client } from '@/types/client'
+import type { RenderResult } from '@testing-library/vue'
+import { setupDashboardHeader } from '@tests/utilities/test-fixtures'
 
 const defaultClients: Client[] = [
   { id: '11111111-1111-1111-1111-111111111111', firstName: 'Luke', lastName: 'Skywalker', email: 'Luke.Skywalker@gmail.com', isArchived: false },
@@ -13,17 +13,16 @@ const defaultClients: Client[] = [
 
 type UpdateEvent = [clients: Client[], isArchived: boolean]
 
+let wrapper: RenderResult
+
 describe('FEATURE: Client header', () => {
+  // Arrange
+  beforeEach(async () => {
+    wrapper = await setupDashboardHeader(defaultClients)
+  })
   describe('RULE: Clients should be filtered by archive status', () => {
     it('EXAMPLE: Selecting the "all" filter for clients should emit active and archived clients', async () => {
       // Arrange
-      const wrapper = await renderWithApp(Header, {
-        useRealSignalR: true,
-        useRealPinia: false,
-        props: {
-          clients: defaultClients,
-        },
-      })
       await clickFilterDropdownOption('option-active')
       wrapper.emitted().update = []
 
@@ -40,15 +39,6 @@ describe('FEATURE: Client header', () => {
       expect(clients.length).toBe(4)
     })
     it('EXAMPLE: Selecting the "active" filter for clients should emit only active clients', async () => {
-      // Arrange
-      const wrapper = await renderWithApp(Header, {
-        useRealSignalR: true,
-        useRealPinia: false,
-        props: {
-          clients: defaultClients,
-        },
-      })
-
       // Act
       await clickFilterDropdownOption('option-active')
 
@@ -64,15 +54,6 @@ describe('FEATURE: Client header', () => {
       expect(clients[1]!.firstName).toBe('Han')
     })
     it('EXAMPLE: Selecting the "archived" filter for clients should emit only archived clients', async () => {
-      // Arrange
-      const wrapper = await renderWithApp(Header, {
-        useRealSignalR: true,
-        useRealPinia: false,
-        props: {
-          clients: defaultClients,
-        },
-      })
-
       // Act
       await clickFilterDropdownOption('option-archived')
 

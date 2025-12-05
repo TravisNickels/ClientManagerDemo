@@ -1,6 +1,7 @@
 import type { Client } from '@/types/client'
 import { renderWithApp } from './render'
 import Dashboard from '@/pages/client-dashboard.vue'
+import DashboardHeader from '@/components/dashboard-header.vue'
 import { useClientStore } from '@/stores/clientStore'
 
 export async function setupDashboard(clients: Client[]) {
@@ -14,4 +15,14 @@ export async function setupDashboard(clients: Client[]) {
   store.allClients = clients
 
   return { wrapper, store }
+}
+
+export async function setupDashboardHeader(clients: Client[]) {
+  return await renderWithApp(DashboardHeader, {
+    useRealSignalR: true,
+    useRealPinia: false,
+    props: {
+      clients: clients,
+    },
+  })
 }
