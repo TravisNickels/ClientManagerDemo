@@ -32,10 +32,16 @@ const emit = defineEmits<{
   </div>
 
   <!-- Rows -->
-  <div v-else class="list-wrapper">
-    <div v-for="client in props.clients" :key="client.id" class="client-row" :class="{ 'client-archived': client.isArchived }">
+  <div v-else class="list-wrapper" aria-label="client-list">
+    <div
+      v-for="client in props.clients"
+      :key="client.id"
+      class="client-row"
+      :class="{ 'client-archived': client.isArchived }"
+      aria-label="client-row"
+    >
       <!-- Left content -->
-      <div class="d-flex align-items-center gap-2 flex-grow-1 overflow-hidden">
+      <div class="d-flex align-items-center gap-2 flex-grow-1 overflow-hidden" :aria-label="client.firstName + client.lastName">
         <router-link :to="{ name: 'client-management', params: { id: client.id } }" class="client-name text-truncate">
           {{ client.firstName }} {{ client.lastName }}
         </router-link>

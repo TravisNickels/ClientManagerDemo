@@ -40,12 +40,16 @@ const emit = defineEmits<{
   </div>
 
   <!-- Cards -->
-  <div v-else class="row g-3 my-1">
+  <div v-else class="row g-3 my-1" aria-label="client-grid">
     <div v-for="client in props.clients" :key="client.id" class="col-md-6 col-lg-4">
-      <div class="card client-card shadow-sm" :class="{ 'client-archived': client.isArchived }">
+      <div class="card client-card shadow-sm" :class="{ 'client-archived': client.isArchived }" aria-label="client-card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-start mb-2">
-            <router-link :to="{ name: 'client-management', params: { id: client.id } }" class="fw-semibold text-decoration-none text-dark">
+            <router-link
+              :to="{ name: 'client-management', params: { id: client.id } }"
+              class="fw-semibold text-decoration-none text-dark"
+              aria-label="client-card-name"
+            >
               {{ client.firstName }} {{ client.lastName }}
             </router-link>
 
