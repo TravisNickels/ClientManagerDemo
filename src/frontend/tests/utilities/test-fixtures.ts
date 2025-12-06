@@ -2,6 +2,7 @@ import type { Client } from '@/types/client'
 import { renderWithApp } from './render'
 import Dashboard from '@/pages/client-dashboard.vue'
 import DashboardHeader from '@/components/dashboard-header.vue'
+import ClientForm from '@/components/client-form.vue'
 import { useClientStore } from '@/stores/client-store'
 import App from '@/App.vue'
 
@@ -45,6 +46,16 @@ export async function setupDashboardHeader(clients: Client[] = defaultClients) {
     useRealPinia: false,
     props: {
       clients: clients,
+    },
+  })
+}
+
+export async function setupClientForm(client: Client, mode: 'edit' | 'create', saving: boolean) {
+  await renderWithApp(ClientForm, {
+    props: {
+      client: client,
+      mode: mode,
+      saving: saving,
     },
   })
 }
