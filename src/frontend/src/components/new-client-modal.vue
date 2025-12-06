@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Client, CreateClientRequest } from '@/types/client'
 import { reactive, ref } from 'vue'
-import { useClientStore } from '@/stores/clientStore'
+import { useClientStore } from '@/stores/client-store'
 import ClientForm from '@/components/client-form.vue'
 import { toast } from 'vue3-toastify'
 

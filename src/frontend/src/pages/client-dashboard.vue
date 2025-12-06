@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useClientStore } from '@/stores/clientStore'
+import { useClientStore } from '@/stores/client-store'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ClientList from '@/components/client-list.vue'

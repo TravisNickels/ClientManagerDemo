@@ -2,7 +2,7 @@
 import { ref, onMounted, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { UpdateClientRequest as Client, UpdateClientRequest } from '@/types/client'
-import { useClientStore } from '@/stores/clientStore'
+import { useClientStore } from '@/stores/client-store'
 import ClientForm from '@/components/client-form.vue'
 import { toast } from 'vue3-toastify'
 import { confirm } from '@/composables/useConfirm'
