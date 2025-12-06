@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { managementPageTitle } from './question/managementPageTitle'
+import { managementPageTitle } from './questions/managementPageTitle'
 import { setupDefaultApp } from '@tests/utilities/test-fixtures'
 import type { Client } from '@/types/client'
 
