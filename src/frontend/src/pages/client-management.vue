@@ -110,7 +110,7 @@ const saveClient = async (): Promise<void> => {
 }
 
 function goHome() {
-  router.push({ name: 'clients-dashboard' })
+  router.push({ name: 'client-dashboard' })
 }
 
 onMounted(loadClient)
