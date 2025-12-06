@@ -20,6 +20,7 @@ app.use(Vue3Toastify, {
   pauseOnHover: true,
   draggable: true,
   showCloseButton: true,
+  clearOnUrlChange: false,
 } as ToastContainerOptions)
 
 app.mount('#app')
