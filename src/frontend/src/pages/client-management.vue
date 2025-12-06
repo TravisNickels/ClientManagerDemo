@@ -129,7 +129,7 @@ onMounted(loadClient)
     </nav>
     <div class="card shadow-sm">
       <div class="card-body">
-        <h2 class="card-title mb-4">Edit Client</h2>
+        <h2 class="card-title mb-4" aria-label="management-heading">Edit Client</h2>
         <ClientForm
           :client="client"
           mode="edit"
