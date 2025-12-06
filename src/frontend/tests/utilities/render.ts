@@ -5,10 +5,13 @@ import { type Component } from 'vue'
 import { vi } from 'vitest'
 import { createPinia, type Pinia } from 'pinia'
 import { signalrConfig } from './signalr-mock'
+import ClientDashboard from '@/pages/client-dashboard.vue'
+import ClientManagement from '@/pages/client-management.vue'
 
 export interface RenderWithAppOptions<T extends Component = Component> extends RenderOptions<T> {
   useRealPinia?: boolean
   useRealSignalR?: boolean
+  initialRoute?: string
   routes?: RouteRecordRaw[]
 }
 
@@ -19,32 +22,33 @@ export async function renderWithApp<T extends Component>(component: T, options: 
     routes: options.routes ?? [
       {
         path: '/',
-        name: '',
-        component: { template: '<div />' },
+        redirect: '/client-dashboard',
       },
       {
         path: '/client-dashboard',
         name: 'client-dashboard',
-        component: { template: '<div />' },
+        component: ClientDashboard,
       },
       {
         path: '/client/:id',
         name: 'client-management',
-        component: { template: '<div />' },
+        component: ClientManagement,
       },
     ],
   })
 
-  await router.push('/')
+  await router.push(options.initialRoute ?? '/client-dashboard')
   await router.isReady()
 
   signalrConfig.useRealSignalR = !!options.useRealSignalR
 
-  return render(component, {
+  const renderedComponent = render(component, {
     ...options,
     global: {
       ...options.global,
       plugins: [...(options.global?.plugins ?? []), pinia, router],
     },
   })
+
+  return { renderedComponent, router }
 }
