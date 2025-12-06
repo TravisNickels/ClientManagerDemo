@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { clientListNames } from './questions/clientListNames'
 import { clientGridNames } from './questions/clientGridNames'
 import type { Client } from '@/types/client'
-import { clickFilterDropdownOption } from './action/clickFilterDropdownOption'
-import { clickClientGridButton, clickClientListButton } from './action/clickClientDisplayButtonGroup'
+import { clickFilterDropdownOption } from './actions/clickFilterDropdownOption'
+import { clickClientGridButton, clickClientListButton } from './actions/clickClientDisplayButtonGroup'
 import { setupDashboard } from '@tests/utilities/test-fixtures'
 
 const defaultClients: Client[] = [

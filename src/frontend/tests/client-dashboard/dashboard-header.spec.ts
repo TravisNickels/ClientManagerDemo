@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { clickFilterDropdownOption } from './action/clickFilterDropdownOption'
+import { clickFilterDropdownOption } from './actions/clickFilterDropdownOption'
 import type { Client } from '@/types/client'
 import type { RenderResult } from '@testing-library/vue'
 import { setupDashboardHeader } from '@tests/utilities/test-fixtures'
