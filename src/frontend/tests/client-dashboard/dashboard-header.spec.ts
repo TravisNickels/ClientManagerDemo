@@ -13,24 +13,25 @@ const defaultClients: Client[] = [
 
 type UpdateEvent = [clients: Client[], isArchived: boolean]
 
-let wrapper: RenderResult
+let cut: RenderResult
 
 describe('FEATURE: Client header', () => {
   // Arrange
   beforeEach(async () => {
-    wrapper = await setupDashboardHeader(defaultClients)
+    const { renderedComponent } = await setupDashboardHeader(defaultClients)
+    cut = renderedComponent
   })
   describe('RULE: Clients should be filtered by archive status', () => {
     it('EXAMPLE: Selecting the "all" filter for clients should emit active and archived clients', async () => {
       // Arrange
       await clickFilterDropdownOption('option-active')
-      wrapper.emitted().update = []
+      cut.emitted().update = []
 
       // Act
       await clickFilterDropdownOption('option-all')
 
       // Assert
-      const emittedValue = wrapper.emitted<UpdateEvent>('update')
+      const emittedValue = cut.emitted<UpdateEvent>('update')
       expect(emittedValue).toBeTruthy()
       expect(emittedValue[0]).toBeTruthy()
 
@@ -43,7 +44,7 @@ describe('FEATURE: Client header', () => {
       await clickFilterDropdownOption('option-active')
 
       // Assert
-      const emittedValue = wrapper.emitted<UpdateEvent>('update')
+      const emittedValue = cut.emitted<UpdateEvent>('update')
       expect(emittedValue).toBeTruthy()
       expect(emittedValue[0]).toBeTruthy()
 
@@ -58,7 +59,7 @@ describe('FEATURE: Client header', () => {
       await clickFilterDropdownOption('option-archived')
 
       // Assert
-      const emittedValue = wrapper.emitted<UpdateEvent>('update')
+      const emittedValue = cut.emitted<UpdateEvent>('update')
       expect(emittedValue).toBeTruthy()
       expect(emittedValue[0]).toBeTruthy()
 
