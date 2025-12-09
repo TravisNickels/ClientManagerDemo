@@ -73,7 +73,8 @@ internal class CreateClientFeature
     [Test]
     public async Task When_Creating_A_Client_Without_A_FirstName_It_Should_Throw_DbUpdateException()
     {
-        // Given a new client without an email
+        // Given a new client without a first name
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         var newClient = new Client
         {
             Id = Guid.Empty,
@@ -81,6 +82,7 @@ internal class CreateClientFeature
             LastName = "Solo",
             Email = "han.solo@gmail.com"
         };
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
 
         // When saving the client to the database
         Func<Task> act = async () =>
