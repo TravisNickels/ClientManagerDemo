@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { mockAxiosGet } from '@tests/utilities/axios-mock'
+import { mockAxiosGet } from '@tests/utilities/mocks/axios-mock'
 import { setActivePinia, createPinia } from 'pinia'
 import { useClientStore } from '@/stores/client-store'
 

@@ -7,8 +7,8 @@ describe('FEATURE: Client management routing', () => {
   describe('RULE: Navigating to a client route loads the management page', () => {
     it('EXAMPLE: Visiting "/client/:id" displays the Edit Client heading', async () => {
       // Arrange
-      const { router, store } = await setupDefaultApp('/client-dashboard')
-      store.getClient = vi.fn().mockResolvedValue({
+      const { router, clientStore } = await setupDefaultApp('/client-dashboard')
+      clientStore.getClient = vi.fn().mockResolvedValue({
         id: '11111111-1111-1111-1111-111111111111',
         firstName: 'Luke',
         lastName: 'Skywalker',

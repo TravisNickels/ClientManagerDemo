@@ -1,12 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/vue'
-import { renderWithApp } from './utilities/render'
-import App from '@/App.vue'
+import { defaultClients, setupApp } from './utilities/test-fixtures'
+import { mockAxiosGet } from './utilities/mocks/axios-mock'
 
-describe('App', () => {
-  it('renders the main heading', async () => {
-    await renderWithApp(App, { useRealSignalR: false, useRealPinia: false })
-    const title = screen.getByLabelText(/title/i)
-    expect(title).toHaveTextContent(/client Management Demo/i)
+describe('FEATURE: App layout', () => {
+  describe('RULE: Main application should render UI', () => {
+    it('EXAMPLE: The main heading is displayed', async () => {
+      mockAxiosGet.mockResolvedValue(defaultClients)
+      await setupApp()
+
+      await screen.findByLabelText(/title/i)
+      const title = screen.getByLabelText(/title/i)
+      expect(title).toHaveTextContent(/client Management Demo/i)
+    })
   })
 })

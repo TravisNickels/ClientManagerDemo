@@ -13,7 +13,7 @@ const clientMissingFirstName: Client = {
 }
 describe('FEATURE: Client form validation', () => {
   describe('RULE: Required fields must prevent submission', () => {
-    it('EXAMPLE: Missing first name shows and error', async () => {
+    it('EXAMPLE: Missing first name shows an error', async () => {
       // Arrange
       await setupClientForm(clientMissingFirstName, 'edit', false)
 
