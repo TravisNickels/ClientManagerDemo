@@ -28,7 +28,7 @@ export const useClientStore = defineStore('clientStore', () => {
       // await new Promise((resolve) => setTimeout(resolve, 1000))
 
       const response: { data: Client[] } = await apiConnection.get<Client[]>('/api/client')
-      allClients.value = response.data
+      allClients.value = response?.data
     } finally {
       isLoading.value = false
     }
