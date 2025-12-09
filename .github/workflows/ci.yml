@@ -25,7 +25,15 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: 24
+      - name: Run frontend tests
+        run: npm run test
+        working-directory: src/frontend
 
       - name: Restore dependencies
         run: dotnet restore src/ClientManager/ClientManager.sln
@@ -35,13 +43,13 @@ jobs:
 
       - name: Test with coverage
         run: |
-            dotnet test src/ClientManager/ClientManager.sln `
-              -c Release `
-              --no-build `
-              --collect:"XPlat Code Coverage" `
-              /p:CoverletOutput=TestResults/coverage/ `
-              /p:CoverletOutputFormat=cobertura `
-      
+          dotnet test src/ClientManager/ClientManager.sln `
+            -c Release `
+            --no-build `
+            --collect:"XPlat Code Coverage" `
+            /p:CoverletOutput=TestResults/coverage/ `
+            /p:CoverletOutputFormat=cobertura `
+
       - name: Generate coverage summary and badge
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
