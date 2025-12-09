@@ -13,8 +13,9 @@ export default mergeConfig(
     },
     test: {
       globals: true,
+      silent: false,
       environment: 'jsdom',
-      setupFiles: ['tests/setup.ts', 'tests/utilities/signalr-mock.ts'],
+      setupFiles: ['tests/setup.ts'],
       exclude: [...configDefaults.exclude, 'e2e/**'],
       include: ['tests/**/*.spec.ts'],
       root: fileURLToPath(new URL('./', import.meta.url)),
