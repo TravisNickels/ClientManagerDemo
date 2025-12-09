@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { SignalrEventName, SignalrEvents } from '@/types/signalr/signalrEvents'
-import { useSignalRClient, type LifecycleEvent, type ConnectionState } from '@/composables/useSignalRClient'
+import { useProvidedSignalRClient } from '@/composables/signalr-client-provider'
+import { type LifecycleEvent } from '@/composables/useSignalRClient'
 import { toast } from 'vue3-toastify'
+
+export type SignalRStoreInstance = ReturnType<typeof useSignalRStore>
+type ConnectionState = 'connected' | 'connecting' | 'reconnecting' | 'disconnected'
 
 export const useSignalRStore = defineStore('signalr', () => {
   const status = ref<ConnectionState>('disconnected')
@@ -10,39 +14,45 @@ export const useSignalRStore = defineStore('signalr', () => {
   const lastSeen = ref<Date | null>(null)
   const isReconnecting = computed(() => status.value === 'reconnecting')
 
-  const client = useSignalRClient()
+  let client: ReturnType<typeof useProvidedSignalRClient> | null = null
 
-  client.onLifecycle(async (event: LifecycleEvent) => {
-    switch (event.type) {
-      case 'connected':
-        status.value = 'connected'
-        toast.success('Connected to SignalR')
-        reconnectAttempt.value = 0
-        lastSeen.value = new Date()
-        break
-      case 'connecting':
-        status.value = 'connecting'
-        break
-      case 'reconnecting':
-        status.value = 'reconnecting'
-        reconnectAttempt.value = event.attempt
-        break
-      case 'disconnected':
-        status.value = 'disconnected'
-        toast.warn('[SignalR] Disconnected')
-        break
-      case 'permanently-disconnected':
-        status.value = 'disconnected'
-        toast.error('SignalR connection permanently lost')
-        break
+  function signalRClient() {
+    if (!client) {
+      client = useProvidedSignalRClient()
+      client.onLifecycle(async (event: LifecycleEvent) => {
+        switch (event.type) {
+          case 'connected':
+            status.value = 'connected'
+            toast.success('Connected to SignalR')
+            reconnectAttempt.value = 0
+            lastSeen.value = new Date()
+            break
+          case 'connecting':
+            status.value = 'connecting'
+            break
+          case 'reconnecting':
+            status.value = 'reconnecting'
+            reconnectAttempt.value = event.attempt
+            break
+          case 'disconnected':
+            status.value = 'disconnected'
+            toast.warn('[SignalR] Disconnected')
+            break
+          case 'permanently-disconnected':
+            status.value = 'disconnected'
+            toast.error('SignalR connection permanently lost')
+            break
+        }
+      })
     }
-  })
+    return client
+  }
 
   // -------------------------------------------------------
   //  Event registration
   // -------------------------------------------------------
   function on<K extends SignalrEventName>(eventName: K, handler: (payload: SignalrEvents[K]) => void): void {
-    client.on(eventName, handler)
+    signalRClient().on(eventName, handler)
   }
 
   // -------------------------------------------------------
@@ -50,7 +60,7 @@ export const useSignalRStore = defineStore('signalr', () => {
   // -------------------------------------------------------
   async function connect() {
     await toast.promise(
-      client.connect(),
+      signalRClient().connect(),
       {
         pending: { render: 'Connecting to the SignalR...' },
         success: { render: 'Connected to SignalR' },
@@ -63,11 +73,11 @@ export const useSignalRStore = defineStore('signalr', () => {
   }
 
   async function disconnect() {
-    if (client && status.value !== 'disconnected') await client.disconnect()
+    if (signalRClient() && status.value !== 'disconnected') await signalRClient().disconnect()
   }
 
   async function manualReconnect(): Promise<void> {
-    await client.manualReconnect()
+    await signalRClient().manualReconnect()
   }
 
   return {
