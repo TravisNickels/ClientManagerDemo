@@ -46,6 +46,6 @@ public class CreateClientHandler(IClientRepository clientRepository, IMessagePub
             Email = message.Email
         };
 
-        await _messagePublisher.PublishAsync(createdEvent);
+        await _messagePublisher.PublishAsync(createdEvent, cancellationToken);
     }
 }
