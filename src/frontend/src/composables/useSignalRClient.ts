@@ -2,7 +2,7 @@ import * as signalR from '@microsoft/signalr'
 import type { SignalrEvents } from '@/types/signalr/signalrEvents'
 
 type Handler<K extends keyof SignalrEvents> = (payload: SignalrEvents[K]) => void
-export type ConnectionState = 'connected' | 'connecting' | 'reconnecting' | 'disconnected'
+export type SignalRClient = ReturnType<typeof signalrClient>
 
 export type LifecycleEvent =
   | { type: 'connected' }
@@ -11,15 +11,15 @@ export type LifecycleEvent =
   | { type: 'reconnecting'; attempt: number }
   | { type: 'permanently-disconnected' }
 
-let _instance: ReturnType<typeof createClient> | null = null
+let _instance: ReturnType<typeof signalrClient> | null = null
 
-export function useSignalRClient(url: string = 'http://localhost:5200/notifications') {
+export function useSignalRClient(url: string = 'http://localhost:5200/notifications'): ReturnType<typeof signalrClient> {
   if (_instance) return _instance
-  _instance = createClient(url)
+  _instance = signalrClient(url)
   return _instance
 }
 
-function createClient(url: string) {
+function signalrClient(url: string) {
   let connection: signalR.HubConnection | null = null
   let attempt: number = 0
   let reconnectTimer: number | null = null
