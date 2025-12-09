@@ -1,10 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import { screen } from '@testing-library/vue'
 import { clientListNames } from './questions/clientListNames'
 import { clientGridNames } from './questions/clientGridNames'
-import type { Client } from '@/types/client'
+import type { Client, ClientResponse } from '@/types/client'
 import { clickFilterDropdownOption } from './actions/clickFilterDropdownOption'
 import { clickClientGridButton, clickClientListButton } from './actions/clickClientDisplayButtonGroup'
 import { setupDashboard } from '@tests/utilities/test-fixtures'
+import { mockAxiosGet } from '@tests/utilities/mocks/axios-mock'
+import { SignalrEventNames } from '@/types/signalr/signalrEvents'
+import { asMockSignalRStore } from '@tests/utilities/mocks/signalr-mock'
 
 const defaultClients: Client[] = [
   { id: '11111111-1111-1111-1111-111111111111', firstName: 'Luke', lastName: 'Skywalker', email: 'Luke.Skywalker@gmail.com', isArchived: false },
@@ -62,18 +66,43 @@ describe('FEATURE: Client list view', () => {
 })
 
 describe('FEATURE: Client grid view', () => {
-  // Arrange
-  beforeEach(async () => {
-    await setupDashboard(defaultClients)
-  })
   describe('RULE: Clients displayed in a grid', () => {
     it('EXAMPLE: All clients should be displayed when the grid button is clicked', async () => {
+      // Arrange
+      await setupDashboard(defaultClients)
+
       // Act
       await clickClientGridButton()
       const clients = await clientGridNames()
 
       // Assert
       expect(clients.length).to.equal(4)
+    })
+  })
+})
+
+describe('FEATURE: SignalR client update', () => {
+  describe('RULE: Dashboard refreshes its client list when a SignalR update event is received', () => {
+    it('EXAMPLE: When a fake client-updated event fires, the updated client data appears on the dashboard', async () => {
+      // Arrange
+      const clientResponse: ClientResponse = {
+        id: '11111111-1111-1111-1111-111111111111',
+        firstName: 'Ahsoka',
+        lastName: 'Tano',
+        email: 'Ahsoka.Tano@gmail.com',
+        isArchived: false,
+      }
+      mockAxiosGet.mockResolvedValue({ data: defaultClients })
+      const { signalRStore } = await setupDashboard()
+      mockAxiosGet.mockResolvedValue({ data: [clientResponse] })
+
+      // Act
+      const mock = asMockSignalRStore(signalRStore)
+      mock.emit(SignalrEventNames.ClientResponse, clientResponse)
+
+      // Assert
+      await screen.findByText(/Ahsoka Tano/i)
+      expect(screen.getByText(/Ahsoka Tano/i)).toBeInTheDocument()
     })
   })
 })
