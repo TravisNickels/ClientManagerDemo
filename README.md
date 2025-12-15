@@ -176,7 +176,7 @@ sequenceDiagram
     %% ====================
     %% DONE
     %% ====================
-    MQ2 -->> PubPipe: ACK
+    MQ -->> PubPipe: ACK
     PubPipe -->> Publisher: done
     Publisher -->> Handler: done
 ```
@@ -252,16 +252,16 @@ sequenceDiagram
 
 ### Technologies Used
 
-| Layer          | Technology                     | Description                                             |
-| -------------- | ------------------------------ | ------------------------------------------------------- |
-| Frontend       | Vue 3, Vite, Pinia             | Reactive UI with real-time updates via SignalR          |
-| API            | ASP.NET Core 9                 | REST endpoints, SignalR hub, and RabbitMQ publisher     |
-| Worker         | .NET 9 Worker Service          | Background consumer that persists data and emits events |
-| Messaging      | RabbitMQ                       | Reliable async communication between API and Worker     |
-| Database       | PostgreSQL                     | Persistent client storage                               |
-| Infrastructure | Docker Compose                 | Multi-service setup with health checks                  |
-| Testing        | NUnit, Vitest, Testing library | Unit and integration testing across API and Worker      |
-| Dev Experience | Hot reload and shared volumes  | Fast feedback loop for backend and frontend             |
+| Layer          | Technology                     | Description                                                   |
+| -------------- | ------------------------------ | ------------------------------------------------------------- |
+| Frontend       | Vue 3, Vite, Pinia             | Reactive UI with real-time updates via SignalR                |
+| API            | ASP.NET Core 9                 | REST endpoints, SignalR hub, and RabbitMQ publisher           |
+| Worker         | .NET 9 Worker Service          | Background consumer that persists data and emits events       |
+| Messaging      | RabbitMQ                       | Reliable async communication between API and Worker           |
+| Database       | PostgreSQL                     | Persistent client storage                                     |
+| Infrastructure | Docker Compose                 | Multi-service setup with health checks                        |
+| Testing        | NUnit, Vitest, Testing library | Unit and integration testing across API, Worker, and frontend |
+| Dev Experience | Hot reload and shared volumes  | Fast feedback loop for backend and frontend                   |
 
 ## 🩺 Health Checks
 
