@@ -57,7 +57,7 @@ This will start the docker services in the following order with health checks:
 - Frontend at http://localhost:5173
 
 > [!NOTE]
-> Swagger UI can be accessed at http://localhost:5200/swagger/index.html to view the API resources
+> Swagger UI can be accessed at http://localhost:5200/swagger/index.html to view the API resources when running in development mode `npm run docker:dev`
 
 ## 🔩 Architecture
 
