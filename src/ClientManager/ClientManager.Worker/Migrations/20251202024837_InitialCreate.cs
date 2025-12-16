@@ -20,7 +20,8 @@ namespace ClientManager.Worker.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: true)
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    IsArchived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,13 +50,24 @@ namespace ClientManager.Worker.Migrations
 
             migrationBuilder.InsertData(
                 table: "Clients",
-                columns: new[] { "Id", "Email", "FirstName", "LastName" },
+                columns: new[] { "Id", "Email", "FirstName", "IsArchived", "LastName" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), "Luke.Skywalker@gmail.com", "Luke", "Skywalker" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), "Han.Solo@gmail.com", "Han", "Solo" },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), "Darth.Vader@gmail.com", "Darth", "Vader" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), "Lord.Sidious@gmail.com", "Lord", "Sidious" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), "Luke.Skywalker@gmail.com", "Luke", false, "Skywalker" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), "Han.Solo@gmail.com", "Han", false, "Solo" },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), "Darth.Vader@gmail.com", "Darth", true, "Vader" },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), "Lord.Sidious@gmail.com", "Lord", true, "Sidious" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Phones",
+                columns: new[] { "Id", "ClientId", "Number", "Type" },
+                values: new object[,]
+                {
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new Guid("11111111-1111-1111-1111-111111111111"), "+1 (111) 111-1111", "Home" },
+                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new Guid("22222222-2222-2222-2222-222222222222"), "+1 (222) 222-2222", "Home" },
+                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), new Guid("33333333-3333-3333-3333-333333333333"), "+1 (333) 333-3333", "Home" },
+                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), new Guid("44444444-4444-4444-4444-444444444444"), "+1 (444) 444-4444", "Home" }
                 });
 
             migrationBuilder.CreateIndex(

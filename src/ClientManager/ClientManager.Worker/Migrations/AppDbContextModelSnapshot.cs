@@ -29,12 +29,16 @@ namespace ClientManager.Worker.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -51,6 +55,7 @@ namespace ClientManager.Worker.Migrations
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             Email = "Luke.Skywalker@gmail.com",
                             FirstName = "Luke",
+                            IsArchived = false,
                             LastName = "Skywalker"
                         },
                         new
@@ -58,6 +63,7 @@ namespace ClientManager.Worker.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             Email = "Han.Solo@gmail.com",
                             FirstName = "Han",
+                            IsArchived = false,
                             LastName = "Solo"
                         },
                         new
@@ -65,6 +71,7 @@ namespace ClientManager.Worker.Migrations
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             Email = "Darth.Vader@gmail.com",
                             FirstName = "Darth",
+                            IsArchived = true,
                             LastName = "Vader"
                         },
                         new
@@ -72,6 +79,7 @@ namespace ClientManager.Worker.Migrations
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             Email = "Lord.Sidious@gmail.com",
                             FirstName = "Lord",
+                            IsArchived = true,
                             LastName = "Sidious"
                         });
                 });
@@ -98,6 +106,36 @@ namespace ClientManager.Worker.Migrations
                     b.HasIndex("ClientId");
 
                     b.ToTable("Phones");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            ClientId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Number = "+1 (111) 111-1111",
+                            Type = "Home"
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            ClientId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Number = "+1 (222) 222-2222",
+                            Type = "Home"
+                        },
+                        new
+                        {
+                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            ClientId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Number = "+1 (333) 333-3333",
+                            Type = "Home"
+                        },
+                        new
+                        {
+                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            ClientId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Number = "+1 (444) 444-4444",
+                            Type = "Home"
+                        });
                 });
 
             modelBuilder.Entity("ClientManager.Shared.Models.Phone", b =>
