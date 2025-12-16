@@ -43,7 +43,7 @@ services:
       - /src/ClientManager.API/obj
       - /src/ClientManager.Shared/bin
       - /src/ClientManager.Shared/obj
-      - ~/.nuget/packages:/root/.nuget/packages:ro
+      - ~/.nuget/packages:/root/.nuget/packages
     ports:
       - "5200:5200"
     restart: always
@@ -80,7 +80,7 @@ services:
       - /src/ClientManager.Worker/obj
       - /src/ClientManager.Shared/bin
       - /src/ClientManager.Shared/obj
-      - ~/.nuget/packages:/root/.nuget/packages:ro
+      - ~/.nuget/packages:/root/.nuget/packages
     restart: always
     env_file:
       - ".env"
