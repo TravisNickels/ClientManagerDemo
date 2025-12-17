@@ -263,6 +263,66 @@ sequenceDiagram
 | Testing        | NUnit, Vitest, Testing library | Unit and integration testing across API, Worker, and frontend |
 | Dev Experience | Hot reload and shared volumes  | Fast feedback loop for backend and frontend                   |
 
+## ⚖️ Trade-offs & Design decisions
+
+This demo makes a handful of deliberate trade-offs. The goal wasn’t to build the most complex system possible, it was to show how a real system behaves when you keep responsibilities clear and resist unnecessary complexity.
+
+Some of these choices would likely change in a production system. For a demo, they keep the focus on message flow, boundaries, and behavior instead of ceremony.
+
+### Read vs Write Separation (Without Going Full CQRS)
+
+Reads and writes are intentionally split by responsibility:
+
+- The API handles reads and publishes commands.
+- The Worker owns writes and domain changes.
+
+Both use the same PostgreSQL database, but through different EF Core contexts (`ReadOnlyAppDbContext` and `AppDbContext`).
+
+I didn’t split this into multiple databases or projections on purpose. That would add a lot of moving parts without making the demo easier to understand. This keeps the boundary clear while staying pragmatic.
+
+### Async Writes, Sync Reads
+
+- Anything that changes state goes through RabbitMQ.
+- Reads stay synchronous.
+
+This keeps the API responsive and avoids long-running requests. The Worker can do the heavier work without blocking callers.
+
+Yes, this introduces eventual consistency. That’s intentional. The system behaves the way real distributed systems do.
+
+### EF Core over Dapper
+
+I chose EF Core over Dapper because persistence isn’t the point of this demo. EF Core keeps the write model simple, transactional, and easy to test, while letting the focus stay on messaging, boundaries, and system behavior. Dapper would be a good fit in a performance-critical system, but it would add noise here without improving the story.
+
+### Message Pipelines
+
+Both message consumption and publishing run through explicit middleware pipelines.
+
+I could have hidden this behind a framework like NServiceBus or MassTransit, but I wanted message flow and context propagation to be visible. You can trace a message from the moment it’s received, through the handler, to the outbound event without guessing what’s happening.
+
+It’s more code, but it’s also easier to reason about.
+
+### SignalR for Notifications, Not State
+
+SignalR is used to notify the frontend that something changed, not to act as the source of truth.
+
+The API still returns data as part of normal HTTP responses, but the frontend typically follows up with a query after receiving a SignalR notification to ensure it’s working with the latest state.
+
+This avoids dual-write problems and keeps responsibilities clear. SignalR drives reactivity, while the API owns correctness. The UI may briefly show stale data, but correctness and consistency matter more than optimistic cleverness.
+
+### No Sagas, No Distributed Transactions
+
+That’s not because they’re bad, it’s because they’re expensive. You only earn that complexity when the problem demands it. This project focuses on the core message flow first, with clear extension points for retries, DLQs, and orchestration later.
+
+### Testing at Service Boundaries
+
+Tests are split by responsibility:
+
+- API tests verify requests and message publishing
+- Worker tests verify persistence and side effects
+- Frontend tests focus on state updates and real-time behavior
+
+This mirrors how distributed systems are usually tested in practice. End-to-end tests are useful, but they’re not where most confidence comes from.
+
 ## 🩺 Health Checks
 
 Each backend service exposes a simple readiness probe:
