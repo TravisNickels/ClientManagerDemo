@@ -59,6 +59,18 @@ This will start the docker services in the following order with health checks:
 > [!NOTE]
 > Swagger UI can be accessed at http://localhost:5200/swagger/index.html to view the API resources when running in development mode `npm run docker:dev`
 
+### Stop and cleanup
+
+This will stop the demo and remove all containers, volumes, and images created by it.
+
+> [!WARNING]
+> This permanently deletes demo data.  
+> Safe as long as you have not attached the demo to shared Docker volumes.
+
+```bash
+npm run docker:stop
+```
+
 ## 🔩 Architecture
 
 This project is built around a simple idea:  
